@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <Time.h>
 
 //////////////////////
 // WiFi Definitions //
@@ -11,12 +12,13 @@ const char WiFiAPPSK[] = "sparkfun";
 const int LED_PIN = 0; // Onboard red LED
 const int ANALOG_PIN = A0; // The only analog pin on the board (TEST)
 const int DIGITAL_PIN = 12; // Digital pin to be read
+String req = "";
 
 WiFiServer server(80);
 
 void setup() 
 {
-  //initHardware(); // See function below
+  initHardware(); // See function below
   setupWiFi(); // See function below
   server.begin();
 }
@@ -26,17 +28,20 @@ void loop()
   // Check if a client has connected
   WiFiClient client = server.available();
   if (!client) {
+    Serial.println(String(millis()));
     return;
   }
-
+  Serial.println(String(millis()));
+  Serial.println("client: "); 
   // Read the first line of the request
-  String req = client.readStringUntil('\r');
-  Serial.println(req); // GET (/led/1, /led/0, /read) HTTP/1.1 
+  req = client.readStringUntil('\r');
+//  Serial.println(req); // GET (/led/1, /led/0, /read) HTTP/1.1 
   client.flush();
 
-  
+  Serial.println(String(millis()));
+  Serial.println("flush: "); 
   // Match the request
-  int val = -2; // We'll use 'val' to keep track of both the
+//  int val = -2; // We'll use 'val' to keep track of both the
                 // request type (read/set) and value if set.
   /*
   if (req.indexOf("/led/0") != -1)
@@ -49,17 +54,17 @@ void loop()
   */
   
   // Set LED according to the request
-  if (val >= 0){
-    if (val == 0) {
-      digitalWrite(LED_PIN, HIGH);
-    }
-    else {
-      digitalWrite(LED_PIN, LOW);
-    }
-  }
+//  if (val >= 0){
+//    if (val == 0) {
+//      digitalWrite(LED_PIN, HIGH);
+//    }
+//    else {
+//      digitalWrite(LED_PIN, LOW);
+//    }
+//  }
     
 
-  client.flush();
+//  client.flush();
 
   // Prepare the response. Start with the common header:
   String s = "HTTP/1.1 200 OK\r\n";
@@ -90,8 +95,10 @@ void loop()
   
   // Send the response to the client
   client.print(s);
-  delay(1);
-  Serial.println("Client disonnected");
+  Serial.println(String(millis()));
+  Serial.println("End client");
+//  delay(1);
+//  Serial.println("Client disonnected");
   
   // The client will actually be disconnected 
   // when the function returns and 'client' object is detroyed
@@ -129,5 +136,7 @@ void initHardware()
   // Don't need to set ANALOG_PIN as input, 
   // that's all it can be.
 }
+
+
 
 

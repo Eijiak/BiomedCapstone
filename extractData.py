@@ -4,6 +4,7 @@ import urllib.request
 import re
 import matplotlib.pyplot as plt
 import numpy
+from datetime import datetime
 
 # Initialize variables
 values=[]
@@ -22,3 +23,4 @@ while(1):
         plt.plot(values)
         plt.draw()
         plt.pause(0.001)
+        print(str(datetime.now()))
