@@ -1,3 +1,4 @@
 ﻿  extractData.c
+c:\users\kaijie\documents\github\biomedcapstone\extractdata\extractdata\extractdata.c(16): warning C4101: 'message': unreferenced local variable
   extractData.vcxproj -> C:\Users\Kaijie\Documents\GitHub\BiomedCapstone\extractData\Debug\extractData.exe
   extractData.vcxproj -> C:\Users\Kaijie\Documents\GitHub\BiomedCapstone\extractData\Debug\extractData.pdb (Full PDB)
