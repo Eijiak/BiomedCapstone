@@ -1,7 +1,5 @@
-#include <Adafruit_ADS1015.h>
 #include <ESP8266WiFi.h>
 #include <Time.h>
-#include <Wire.h>
 
 //////////////////////
 // WiFi Definitions //
@@ -16,18 +14,10 @@ const int ANALOG_PIN = A0; // The only analog pin on the board (TEST)
 const int DIGITAL_PIN = 12; // Digital pin to be read
 String req = "";
 
-/////////////////////
-// ADC Defenitions //
-/////////////////////
-Adafruit_ADS1015 ADC1; // construct an ads1015 at the default address (0x48)
-/* Possibly second ads1015 */
-
 WiFiServer server(80);
 
 void setup() 
 {
-  ADC1.begin(); // initialize ADCs
-  /* Possibly second ads1015 */
   initHardware(); // See function below
   setupWiFi(); // See function below
   server.begin();
@@ -76,22 +66,6 @@ void loop()
 
 //  client.flush();
 
-  //Getting single-ended data from the adc
-
-  int16_t a0, a1, a2, a3;  // SIGNED integer of 16 bits
-
-  a0 = ADC1.readADC_SingleEnded(0);
-  a1 = ADC1.readADC_SingleEnded(1);
-  a2 = ADC1.readADC_SingleEnded(2);
-  a3 = ADC1.readADC_SingleEnded(3);
-  // ADC and ACC test code
-  //Serial.print("A0: "); Serial.println(a0);
-  //Serial.print("A1: "); Serial.println(a1);
-  //Serial.print("A2: "); Serial.println(a2);
-  //Serial.print("A3: "); Serial.println(a3);
-  //delay(500);
-
-
   // Prepare the response. Start with the common header:
   String s = "HTTP/1.1 200 OK\r\n";
   s += "Content-Type: text/html\r\n\r\n";
@@ -129,7 +103,6 @@ void loop()
   // The client will actually be disconnected 
   // when the function returns and 'client' object is detroyed
 }
-
 
 void setupWiFi()
 {
