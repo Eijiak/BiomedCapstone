@@ -1,8 +1,12 @@
+/*
+    Create a TCP socket
+*/
+ 
 #include<stdio.h>
 #include<winsock2.h>
-
-#pragma comment(lib,"ws2_32.lib")
-
+ 
+#pragma comment(lib,"ws2_32.lib") //Winsock Library
+ 
 int main(int argc , char *argv[])
 {
     WSADATA wsa;
@@ -27,5 +31,3 @@ int main(int argc , char *argv[])
  
     return 0;
 }
-
-//Testing
