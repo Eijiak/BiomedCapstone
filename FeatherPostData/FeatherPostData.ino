@@ -12,8 +12,8 @@ const int LED_PIN = 0; // Onboard red LED
 const int ANALOG_PIN = A0; // The only analog pin on the board (TEST)
 
 // Defined variables
-uint8_t analogData;
-int storedData[2000];
+uint16_t analogData;
+uint16_t storedData[2000];
 int counter = 0;
 String message = "";
 long previousMillis = 0;        // will store last time LED was updated
