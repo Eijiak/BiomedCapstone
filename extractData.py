@@ -41,7 +41,6 @@ while(1):
             ps = np.abs(np.fft.fft(values[previousNumberValues:currentNumberValues]))**2 # only fft the most recent values
             freqs = np.fft.fftfreq(window, time_step)
             idx = np.argsort(freqs)
-            print(str(datetime.now()))
             for i in range (0, len(freqs[idx])):
                 if(freqs[idx][i] > 30 and freqs[idx][i] <= 50):
                     gammaIndexes.append(i)
@@ -53,7 +52,6 @@ while(1):
                     thetaIndexes.append(i)
                 elif(freqs[idx][i] >= 0.1 and freqs[idx][i] <= 4):
                     deltaIndexes.append(i)
-            print(str(datetime.now()))
             for i in range (0, len(gammaIndexes)):
                 gammaSum += ps[idx][gammaIndexes[i]]
 
