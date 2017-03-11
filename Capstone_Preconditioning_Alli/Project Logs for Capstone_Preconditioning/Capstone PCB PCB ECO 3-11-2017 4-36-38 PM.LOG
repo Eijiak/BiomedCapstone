@@ -1,0 +1,5 @@
+Change Component Footprint: Designator=C2 Old Footprint=RAD-0.3 New Footprint=CAP_0603
+Change Component Footprint: Designator=C3 Old Footprint=RAD-0.3 New Footprint=CAP_0603
+Change Component Footprint: Designator=C5 Old Footprint=RAD-0.3 New Footprint=CAP_0603
+Change Component Footprint: Designator=C6 Old Footprint=RAD-0.3 New Footprint=CAP_0603
+Change Class Name : Old Net Name=CapstonPCB New Net Name=Capstone_Preconditioning_SchematicSheet
