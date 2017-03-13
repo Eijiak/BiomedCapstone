@@ -1,0 +1,4 @@
+Change Physical Footprint: Designator=ACC Old Footprint=ADXL377_Acc New Footprint=ADXL377_Acc
+Change Physical Footprint: Designator=ADC Old Footprint=ADC New Footprint=ADC
+Change Physical Footprint: Designator=IC2 Old Footprint=TLC2277 New Footprint=TLC2277
+Change Physical Footprint: Designator=IC4 Old Footprint=TLC2277 New Footprint=TLC2277
