@@ -6,19 +6,16 @@ from datetime import datetime
 
 time_step = 1/200; # corresponds to 200 Hz
 
-array = [1, 2, 3, 4, 5]
-del array[1:2]
-print(array)
-"""
 x = np.arange(0,2000)
-
 w1 = 50.0 # wavelength (meters)
 w2 = 20.0 # wavelength (meters)
-fx = np.sin(np.pi*x/w1)+ np.sin(np.pi*x/w2)# + 2*np.cos(2*np.pi*x/w2) # signal
+fx = np.sin(np.pi*x/w1)+ np.sin(np.pi*x/w2)# + 2*np.cos(2*np.pi*x/w2) # signal
+
 
 
 ps = np.abs(np.fft.fft(fx))**2
-freqs = np.fft.fftfreq(2000, time_step)
+freqs = np.fft.fftfreq(600, time_step)
+print(freqs)
 idx = np.argsort(freqs)
 
 # Variables
@@ -74,7 +71,6 @@ plt.subplot(132)
 plt.plot(freqs[idx], ps[idx])
 
 ax = plt.subplot(133)
-print(len(sums))
 ind = np.arange(len(sums))
 width = 0.7
 ax.bar(ind, sums, width)
@@ -84,7 +80,7 @@ axes = plt.gca()
 axes.set_ylim([0, 1000])
 plt.show()
 
-"""
+
 """
 w = np.fft.fft(fx)
 freqs = np.fft.fftfreq(len(fx), time_step)

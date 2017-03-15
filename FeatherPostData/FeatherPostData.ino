@@ -50,7 +50,8 @@ void loop() {
   if (currentMillis - previousMillis > interval && counter < 2000){
     previousMillis = currentMillis;
     storedData[counter] = ads1015.readADC_SingleEnded(3); //analogRead(ANALOG_PIN);
-    Serial.println(storedData[counter]);
+    Serial.println(millis());
+//    Serial.println(storedData[counter]);
     counter ++;
   }
   
