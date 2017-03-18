@@ -9,7 +9,7 @@ from datetime import datetime
 # Initialize variables
 values=[]
 n = 3 # A data point comes every 3 chars
-time_step = 0.006;
+time_step = 0.006; # ESP samples 1 sample/6ms
 
 gammaIndexes = []
 gammaSum = 0

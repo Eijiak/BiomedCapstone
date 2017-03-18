@@ -9,7 +9,7 @@ time_step = 1/200; # corresponds to 200 Hz
 x = np.arange(0,2000)
 w1 = 50.0 # wavelength (meters)
 w2 = 20.0 # wavelength (meters)
-fx = np.sin(np.pi*x/w1)+ np.sin(np.pi*x/w2)# + 2*np.cos(2*np.pi*x/w2) # signal
+fx = np.sin(2*np.pi*x*w1)# np.sin(2*np.pi*x*w2)# + 2*np.cos(2*np.pi*x/w2) # signal
 
 
 
