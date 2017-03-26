@@ -9,7 +9,7 @@
 Adafruit_ADS1015 ads1015;
 
 // SSID and Password
-const char *ssid = "ESP Hotspot";
+const char *ssid = "eHIT";
 const char *password = "capstone";
 
 // Pin definitions
