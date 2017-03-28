@@ -6,6 +6,7 @@ import numpy as np
 from numpy import fft
 from datetime import datetime
 from matplotlib import style
+from scipy import signal
 
 ##style.use('fivethirtyeight')
 
@@ -109,6 +110,10 @@ while(1):
                 
                 plt.pause(0.00001)
                 previousNumberValues = currentNumberValues
+				
+
+	
+	
             
         
     
