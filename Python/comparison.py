@@ -12,8 +12,12 @@ from scipy import signal
 def removeDC(signal, time_step):
 
 	fs = 1/time_step
+	
+	return
 
-def isImpact:
+def isImpact():
+
+	return
 
 def compare(baseline1, baseline2, elec1, elec2, time_step):
 
@@ -148,7 +152,51 @@ freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, sumsDiff = ft_compare(base
 	return freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff
 		
 	
-def ft_plot:
+def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
+'''
+function plots PSD of baseline and post-impact eeg data
+also plots frequency groups in a bar graph
+
+Inputs:
+freq - frquency/x-axis for PSD plots
+PSD_base - baseline PSD y-axis
+PSD_impact - post-impact PSD y-axis
+sumsBasePSD - list of gamma, beta, alpha, theta, delta levels - baseline
+sumsImpactPSD - list of gamma, beta, alpha, theta, delta levels - post-impact
+'''
+
+	fig = plt.figure(figsize=(4,3))
+	
+	sub1 = fig.add_subplot(131)  # PSD of baseline
+	sub1.set_title('Power Spectral Density - Baseline')
+	sub1.set_xlabel('f[Hz]')
+	sub1.set_ylabel('PSD[V^2/Hz]')
+	sub1.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub1.plot(freq, PSD_base)
+	
+	sub2 = fig.add_subplot(132)  # PSD of post-impact data
+	sub2.set_title('Power Spectral Density - Post-Impact')
+	sub2.set_xlabel('f[Hz]')
+	sub2.set_ylabel('PSD[V^2/Hz]')
+	sub2.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub2.plot(freq, PSD_impact)
+	
+	# levels of different frequency groups
+	# display baseline and post-impact info in one bar graph
+	ind = np.arange(len(sumsBasePSD))
+    width = 0.15
+	sub3 = fig.add_subplot(133) 
+	rects1 = sub3.bar(ind, sumsBasePSD, width, color='b')
+	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
+	sub3.set_title("Levels of Frequency Groups")
+	sub3.set_xticks(ind + width / 2)
+	sub3.set_xticklabels(("Gamma", "Beta", "Alpha", "Theta", "Delta"))
+	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
+	
+	plt.tight_layout()
+	plt.show()
+	
+	return
 
 def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 """
@@ -237,6 +285,49 @@ freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff = xcoh_compare(baselin
 		
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 
-def xcoh_plot:
+def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
+'''
+function plots Coherence of baseline and post-impact eeg data
+also plots coherence in frequency groups in a bar graph
 
+Inputs:
+freq - frquency/x-axis for PSD plots
+C_base - baseline Coherence y-axis
+C_impact - post-impact Coherence y-axis
+sumsBaseC - list of gamma, beta, alpha, theta, delta levels - baseline
+sumsImpactC - list of gamma, beta, alpha, theta, delta levels - post-impact
+'''
+
+	fig = plt.figure(figsize=(4,3))
+	
+	sub1 = fig.add_subplot(131)  # Coherence of baseline
+	sub1.set_title('Coherence plot - Baseline')
+	sub1.set_xlabel('f[Hz]')
+	sub1.set_ylabel('Coherence')
+	sub1.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub1.plot(freq, C_base)
+	
+	sub2 = fig.add_subplot(132)  # Coherence of post-impact data
+	sub2.set_title('Coherence plot - Post-Impact')
+	sub2.set_xlabel('f[Hz]')
+	sub2.set_ylabel('Coherence')
+	sub2.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub2.plot(freq, C_impact)
+	
+	# levels of Coherence in different frequency groups
+	# display baseline and post-impact info in one bar graph
+	ind = np.arange(len(sumsBaseC))
+    width = 0.15
+	sub3 = fig.add_subplot(133) 
+	rects1 = sub3.bar(ind, sumsBaseC, width, color='b')
+	rects2 = sub3.bar(ind + width, sumsImpactC, width, color='r')
+	sub3.set_title("Levels of Coherence in Frequency Groups")
+	sub3.set_xticks(ind + width / 2)
+	sub3.set_xticklabels(("Gamma", "Beta", "Alpha", "Theta", "Delta"))
+	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
+	
+	plt.tight_layout()
+	plt.show()
+	
+	return
 
