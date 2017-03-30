@@ -1,5 +1,9 @@
 # Note Ctrl+C is Keyboard interrupt
 
+# Errors:
+# raise BadStatusLine(line) from urllib.request.urllopen
+# TimeoutError: [WinError 10060] A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+
 import urllib.request
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation 
@@ -17,7 +21,7 @@ values1=[]
 values2=[]
 values3=[]
 n = 3 # A data point comes every 3 chars
-time_step = 0.006; # ESP samples 1 sample/6ms
+time_step = 0.00675; # ESP samples 1 sample/6ms (adjust to get accurate FFT)
 
 gammaIndexes = []
 gammaSum = 0
@@ -36,8 +40,8 @@ currentNumberValues = 0;
 currentIndex = 0;
 numDiff = 0;
 
+# Initialize matplotlib plot
 fig = plt.figure()
-##ax1 = fig.add_subplot(1,1,1)
 ax1 = fig.add_subplot(1,3,1)
 ax2 = fig.add_subplot(1,3,2)
 ax3 = fig.add_subplot(1,3,3)
@@ -70,7 +74,6 @@ def animate(i):
     with urllib.request.urlopen('http://192.168.4.1/') as f: # Reads analog data from ESP
         y=f.read(2000)
         convData = y.decode("utf-8") # Convert from byte
-##        print (convData)
         
         # Get indexes of different data
         endIndex0 = convData.find(',')
@@ -78,23 +81,23 @@ def animate(i):
         endIndex2 = convData.find(',', endIndex1+1)
         endIndex3 = len(convData)-1
 
-        if (endIndex0 > 0): # Weak check the data is in the right format
+        if (endIndex0 > 0): # Checks that there is a comma 
             values = values + [convData[i:i+n] for i in range(0, endIndex0-1, n)] # Break data into chunks of n chars
-##            print(values)
             values1 = values1 + [convData[j:j+n] for j in range(endIndex0+1, endIndex1-1, n)]
             values2 = values2 + [convData[k:k+n] for k in range(endIndex1+1, endIndex2-1, n)]
             values3 = values3 + [convData[m:m+n] for m in range(endIndex2+1, endIndex3, n)]
-            print(len(values))
-            if (i%4 == 0):
+
+            if (i%4 == 0): # Only graph data every 4 iterations
                 currentNumberValues = len(values)
                 numDiff = currentNumberValues - previousNumberValues                        
                 currentIndex = currentNumberValues-1;
-                
-##                print(numDiff)
+
+                # Fourier Transform 
                 ps = np.abs(np.fft.fft(values[previousNumberValues:currentNumberValues]))**2 # only fft the most recent values
                 freqs = np.fft.fftfreq(numDiff, time_step)
                 idx = np.argsort(freqs)
 
+                # Comparison of Frequencies
                 for i in range (0, len(freqs[idx])):
                     if(freqs[idx][i] > 30 and freqs[idx][i] <= 50): # Gamma frequencies
                         gammaSum += ps[idx][i]
@@ -118,7 +121,7 @@ def animate(i):
                 ax2.plot(freqs[idx], ps[idx]) # freqs[idx] go from -100 to 100 Hz
                 
 
-                # Plot desired frequency sums
+                # Plot comparison of frequencies
                 ind = np.arange(len(sums))
                 width = 0.7
                 ax3.clear()
@@ -128,15 +131,10 @@ def animate(i):
 
                 previousNumberValues = currentNumberValues
                  
-            
-            
-            
-
-                                            
-            
-
-print ('hi')
-ani = animation.FuncAnimation(fig, animate, interval=1000)
+                return                                  
+    
+print ('About to start...')
+ani = animation.FuncAnimation(fig, animate, interval=1000) # Interval determines in ms how often to run animate 
 plt.show();
         
     
