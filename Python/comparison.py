@@ -1,6 +1,5 @@
 # Note Ctrl+C is Keyboard interrupt
 
-import urllib.request
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
@@ -67,28 +66,28 @@ def compare(baseline1, baseline2, elec1, elec2, time_step):
 	return
 
 def ft_compare(baseline, elec, time_step):
-"""
-function computes power spectran densities of two signals and compares them
-comparison is done via looking at gamma, beta, alpha, theta, delta components
-DOES NOT PLOT
+	"""
+	function computes power spectran densities of two signals and compares them
+	comparison is done via looking at gamma, beta, alpha, theta, delta components
+	DOES NOT PLOT
 
-Inputs:
-baseline - list of baseline eeg input values
-elec - list of post-impact eeg input values
-time_step - sampling stem of our signal
-IMPORTANT: BASELINE AND ELEC LIST MUST HAVE SAME LENGTH
+	Inputs:
+	baseline - list of baseline eeg input values
+	elec - list of post-impact eeg input values
+	time_step - sampling stem of our signal
+	IMPORTANT: BASELINE AND ELEC LIST MUST HAVE SAME LENGTH
 
-Outputs:
-freqBase - PSD x-axis
-PSD_base - Baseline PSD y-axis
-PSD_impact - post-impact y-axis
-sumsBase - baseline gamma, beta, alpha, theta, delta components
-sumsImpact - post-impact gamma, beta, alpha, theta, delta components
-relDiff - (abs (sumsBase - sumsDiff) )/ sumsBase
+	Outputs:
+	freqBase - PSD x-axis
+	PSD_base - Baseline PSD y-axis
+	PSD_impact - post-impact y-axis
+	sumsBase - baseline gamma, beta, alpha, theta, delta components
+	sumsImpact - post-impact gamma, beta, alpha, theta, delta components
+	relDiff - (abs (sumsBase - sumsDiff) )/ sumsBase
 
-Format:
-freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, sumsDiff = ft_compare(baseline, elec, time_step)
-"""
+	Format:
+	freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, sumsDiff = ft_compare(baseline, elec, time_step)
+	"""
 
 	# variables for different baseline eeg frequency groups
 	gammaSumBase = 0
@@ -153,17 +152,17 @@ freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, sumsDiff = ft_compare(base
 		
 	
 def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
-'''
-function plots PSD of baseline and post-impact eeg data
-also plots frequency groups in a bar graph
+	'''
+	function plots PSD of baseline and post-impact eeg data
+	also plots frequency groups in a bar graph
 
-Inputs:
-freq - frquency/x-axis for PSD plots
-PSD_base - baseline PSD y-axis
-PSD_impact - post-impact PSD y-axis
-sumsBasePSD - list of gamma, beta, alpha, theta, delta levels - baseline
-sumsImpactPSD - list of gamma, beta, alpha, theta, delta levels - post-impact
-'''
+	Inputs:
+	freq - frquency/x-axis for PSD plots
+	PSD_base - baseline PSD y-axis
+	PSD_impact - post-impact PSD y-axis
+	sumsBasePSD - list of gamma, beta, alpha, theta, delta levels - baseline
+	sumsImpactPSD - list of gamma, beta, alpha, theta, delta levels - post-impact
+	'''
 
 	fig = plt.figure(figsize=(4,3))
 	
@@ -184,7 +183,7 @@ sumsImpactPSD - list of gamma, beta, alpha, theta, delta levels - post-impact
 	# levels of different frequency groups
 	# display baseline and post-impact info in one bar graph
 	ind = np.arange(len(sumsBasePSD))
-    width = 0.15
+        width = 0.15
 	sub3 = fig.add_subplot(133) 
 	rects1 = sub3.bar(ind, sumsBasePSD, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
@@ -199,31 +198,31 @@ sumsImpactPSD - list of gamma, beta, alpha, theta, delta levels - post-impact
 	return
 
 def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
-"""
-function computes coherence of two signals and compares them
-comparison is done via looking at gamma, beta, alpha, theta, delta components
-Take coherence of two differential eeg inputs at baseline and at post-impact
-DOES NOT PLOT
+	"""
+	function computes coherence of two signals and compares them
+	comparison is done via looking at gamma, beta, alpha, theta, delta components
+	Take coherence of two differential eeg inputs at baseline and at post-impact
+	DOES NOT PLOT
 
-Inputs:
-baseline1 - list of baseline diferential eeg input pair 1 values
-baseline2 - list of baseline diferential eeg input pair 1 values
-elec1 - list of post-impact diferential eeg input pair 1 values
-elec2 - list of post-impact diferential eeg input pair 1 values
-time_step - sampling stem of our signal
-IMPORTANT: ALL LISTS MUST HAVE SAME LENGTH
+	Inputs:
+	baseline1 - list of baseline diferential eeg input pair 1 values
+	baseline2 - list of baseline diferential eeg input pair 1 values
+	elec1 - list of post-impact diferential eeg input pair 1 values
+	elec2 - list of post-impact diferential eeg input pair 1 values
+	time_step - sampling stem of our signal
+	IMPORTANT: ALL LISTS MUST HAVE SAME LENGTH
 
-Outputs:
-freqBase - PSD x-axis
-C_base - Baseline coherence
-C_impact - post-impact coherence
-sumsBase - baseline gamma, beta, alpha, theta, delta components
-sumsImpact - post-impact gamma, beta, alpha, theta, delta components
-relDiff - (abs (sumsBase - sumsDiff))/sumsBase
+	Outputs:
+	freqBase - PSD x-axis
+	C_base - Baseline coherence
+	C_impact - post-impact coherence
+	sumsBase - baseline gamma, beta, alpha, theta, delta components
+	sumsImpact - post-impact gamma, beta, alpha, theta, delta components
+	relDiff - (abs (sumsBase - sumsDiff))/sumsBase
 
-Format:
-freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff = xcoh_compare(baseline1, baseine2, elec1, elec2, time_step)
-"""
+	Format:
+	freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff = xcoh_compare(baseline1, baseine2, elec1, elec2, time_step)
+	"""
 
 	# variables for different baseline eeg frequency groups
 	gammaSumBase = 0
@@ -286,17 +285,17 @@ freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff = xcoh_compare(baselin
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 
 def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
-'''
-function plots Coherence of baseline and post-impact eeg data
-also plots coherence in frequency groups in a bar graph
+	'''
+	function plots Coherence of baseline and post-impact eeg data
+	also plots coherence in frequency groups in a bar graph
 
-Inputs:
-freq - frquency/x-axis for PSD plots
-C_base - baseline Coherence y-axis
-C_impact - post-impact Coherence y-axis
-sumsBaseC - list of gamma, beta, alpha, theta, delta levels - baseline
-sumsImpactC - list of gamma, beta, alpha, theta, delta levels - post-impact
-'''
+	Inputs:
+	freq - frquency/x-axis for PSD plots
+	C_base - baseline Coherence y-axis
+	C_impact - post-impact Coherence y-axis
+	sumsBaseC - list of gamma, beta, alpha, theta, delta levels - baseline
+	sumsImpactC - list of gamma, beta, alpha, theta, delta levels - post-impact
+	'''
 
 	fig = plt.figure(figsize=(4,3))
 	
@@ -317,7 +316,7 @@ sumsImpactC - list of gamma, beta, alpha, theta, delta levels - post-impact
 	# levels of Coherence in different frequency groups
 	# display baseline and post-impact info in one bar graph
 	ind = np.arange(len(sumsBaseC))
-    width = 0.15
+	width = 0.15
 	sub3 = fig.add_subplot(133) 
 	rects1 = sub3.bar(ind, sumsBaseC, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactC, width, color='r')
