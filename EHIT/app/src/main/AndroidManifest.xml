@@ -8,7 +8,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
+
         <activity
             android:name=".homeActivity"
             android:label="@string/app_name"
@@ -22,6 +24,10 @@
         <activity
             android:name=".configureActivity"
             android:label="@string/title_activity_configure"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".baselineActivity"
+            android:label="@string/title_activity_baseline"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

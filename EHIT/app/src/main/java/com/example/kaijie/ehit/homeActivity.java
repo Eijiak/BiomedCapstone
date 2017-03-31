@@ -22,9 +22,9 @@ public class homeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    public void goToAnActivity(View view) {
-        Intent Intent = new Intent(this, configureActivity.class);
-        startActivity(Intent);
+    public void goToConfigure(View view) {
+        Intent intent = new Intent(this, configureActivity.class);
+        startActivity(intent);
     }
 
     @Override
