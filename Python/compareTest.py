@@ -12,6 +12,7 @@ from scipy import signal
 fs = 166.67 # same sampling time for all four signals
 N = 1e4 # same number of data points for all signals
 time = np.arange(N)/fs # discrete time
+noise_power = 0.5*fs/2
 
 freq1 = 40 # random assortment of frequencies 
 freq2 = 45 # will be used to construct four unique signals
@@ -53,7 +54,7 @@ sig3 += (2*np.sqrt(1))*np.sin(2*np.pi*freq10*time) #delta
 sig3 += np.random.normal(scale=np.sqrt(noise_power), size=time.shape) #add noise
 
 # construction of signal 4
-sig4 += (2*np.sqrt(3))*np.sin(2*np.pi*freq4*time) #beta
+sig4 = (2*np.sqrt(3))*np.sin(2*np.pi*freq4*time) #beta
 sig4 += (2*np.sqrt(1.5))*np.sin(2*np.pi*freq6*time) #alpha
 sig4 += (2*np.sqrt(3))*np.sin(2*np.pi*freq7*time) #theta
 sig4 += (2*np.sqrt(5))*np.sin(2*np.pi*freq10*time) #delta

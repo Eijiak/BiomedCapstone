@@ -44,12 +44,12 @@ def compare(baseline1, baseline2, elec1, elec2, time_step):
 	freqBase, C_base, C_impact, sumsBaseC, sumsImpactC, relDiffC = xcoh_compare(baseline1, baseine2, elec1, elec2, time_step)
 	
 	# go through the relative differences in frequency level and 
-	# increment warnCount if relDiff >= 0.5
+	# increment warnCount if relDiff >= 0.8 for psd and relDiff >= 0.5 for coherence
 	for i in range(0,5):
-		if (relDiffPSD1[i] >= 0.5):
+		if (relDiffPSD1[i] >= 0.8):
 			warnCount += 1
 	for j in range(0.5):
-		if (relDiffPSD2[j] >= 0.5):
+		if (relDiffPSD2[j] >= 0.8):
 			warnCount += 1
 	for k in range(0.5):
 		if (relDiffC[k] >= 0.5):
@@ -116,29 +116,29 @@ def ft_compare(baseline, elec, time_step):
 	# when adding up the PSD components, use log10 values for better linearity
 	for i in range(0,len(freqBase)):
 		if ((freqBase[i] > 30) and (freqBase[i] <= 50)): #gamma
-			gammaSumBase += np.log10(PSD_base[i])
+			gammaSumBase += PSD_base[i]
 		elif ((freqBase[i] > 14) and (freqBase[i] <= 30)): #beta
-			betaSumBase += np.log10(PSD_base[i])
+			betaSumBase += PSD_base[i]
 		elif ((freqBase[i] > 8) and (freqBase[i] <= 14)): #alpha
-			alphaSumBase += np.log10(PSD_base[i])
+			alphaSumBase += PSD_base[i]
 		elif ((freqBase[i] > 4) and (freqBase[i] <= 8)): #theta
-			thetaSumBase += np.log10(PSD_base[i])
+			thetaSumBase += PSD_base[i]
 		elif ((freqBase[i] >= 1) and (freqBase[i] <= 4)): #delta
-			deltaSumBase += np.log10(PSD_base[i])
+			deltaSumBase += PSD_base[i]
 			
 	sumsBase = [gammaSumBase, betaSumBase, alphaSumBase, thetaSumBase, deltaSumBase]
 	
 	for j in range(0,len(freqImpact)):
 		if ((freqImpact[j] > 30) and (freqImpact[j] <= 50)): #gamma
-			gammaSumImpact += np.log10(PSD_impact[j])
+			gammaSumImpact += PSD_impact[j]
 		elif ((freqImpact[j] > 14) and (freqImpact[j] <= 30)): #beta
-			betaSumImpact += np.log10(PSD_impact[j])
+			betaSumImpact += PSD_impact[j]
 		elif ((freqImpact[j] > 8) and (freqImpact[j] <= 14)): #alpha
-			alphaSumImpact += np.log10(PSD_impact[j])
+			alphaSumImpact += PSD_impact[j]
 		elif ((freqImpact[j] > 4) and (freqImpact[j] <= 8)): #theta
-			thetaSumImpact += np.log10(PSD_impact[j])
+			thetaSumImpact += PSD_impact[j]
 		elif ((freqImpact[j] >= 1) and (freqImpact[j] <= 4)): #delta
-			deltaSumImpact += np.log10(PSD_impact[j])
+			deltaSumImpact += PSD_impact[j]
 			
 	sumsImpact = [gammaSumImpact, betaSumImpact, alphaSumImpact, thetaSumImpact, deltaSumImpact]
 	
@@ -164,16 +164,16 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	sumsImpactPSD - list of gamma, beta, alpha, theta, delta levels - post-impact
 	'''
 
-	fig = plt.figure(figsize=(4,3))
+	fig = plt.figure(figsize=(10,7))
 	
-	sub1 = fig.add_subplot(131)  # PSD of baseline
+	sub1 = fig.add_subplot(311)  # PSD of baseline
 	sub1.set_title('Power Spectral Density - Baseline')
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('PSD[V^2/Hz]')
 	sub1.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
 	sub1.plot(freq, PSD_base)
 	
-	sub2 = fig.add_subplot(132)  # PSD of post-impact data
+	sub2 = fig.add_subplot(312)  # PSD of post-impact data
 	sub2.set_title('Power Spectral Density - Post-Impact')
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('PSD[V^2/Hz]')
@@ -184,7 +184,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	# display baseline and post-impact info in one bar graph
 	ind = np.arange(len(sumsBasePSD))
         width = 0.15
-	sub3 = fig.add_subplot(133) 
+	sub3 = fig.add_subplot(313) 
 	rects1 = sub3.bar(ind, sumsBasePSD, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
 	sub3.set_title("Levels of Frequency Groups")
@@ -297,16 +297,16 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	sumsImpactC - list of gamma, beta, alpha, theta, delta levels - post-impact
 	'''
 
-	fig = plt.figure(figsize=(4,3))
+	fig = plt.figure(figsize=(10,7))
 	
-	sub1 = fig.add_subplot(131)  # Coherence of baseline
+	sub1 = fig.add_subplot(311)  # Coherence of baseline
 	sub1.set_title('Coherence plot - Baseline')
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('Coherence')
 	sub1.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
 	sub1.plot(freq, C_base)
 	
-	sub2 = fig.add_subplot(132)  # Coherence of post-impact data
+	sub2 = fig.add_subplot(312)  # Coherence of post-impact data
 	sub2.set_title('Coherence plot - Post-Impact')
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('Coherence')
@@ -317,7 +317,7 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	# display baseline and post-impact info in one bar graph
 	ind = np.arange(len(sumsBaseC))
 	width = 0.15
-	sub3 = fig.add_subplot(133) 
+	sub3 = fig.add_subplot(313) 
 	rects1 = sub3.bar(ind, sumsBaseC, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactC, width, color='r')
 	sub3.set_title("Levels of Coherence in Frequency Groups")
