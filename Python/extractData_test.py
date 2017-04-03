@@ -16,24 +16,13 @@ from matplotlib import style
 #style.use('fivethirtyeight')
 
 # Initialize variables
-values=[]
-values1=[]
-values2=[]
-values3=[]
+elec1=[]
+elec2=[]
+accX=[]
+accY=[]
+
 n = 3 # A data point comes every 3 chars
 time_step = 0.00675; # ESP samples 1 sample/6ms (adjust to get accurate FFT)
-
-gammaIndexes = []
-gammaSum = 0
-betaIndexes =[]
-betaSum = 0
-alphaIndexes = []
-alphaSum = 0
-thetaIndexes = []
-thetaSum = 0
-deltaIndexes = []
-deltaSum = 0
-
 window = 200;
 previousNumberValues = 0;
 currentNumberValues = 0;
@@ -42,92 +31,55 @@ numDiff = 0;
 
 # Initialize matplotlib plot
 fig = plt.figure()
-ax1 = fig.add_subplot(1,3,1)
-ax2 = fig.add_subplot(1,3,2)
-ax3 = fig.add_subplot(1,3,3)
+ax1 = fig.add_subplot(1,2,1)
+ax2 = fig.add_subplot(1,2,2)
 
 def animate(i):
-    global values
-    global values1
-    global values2
-    global values3
+    global elec1
+    global elec2
+    global accX
+    global accY
+
     global n
     global time_step
-
-    global gammaIndexes 
-    global gammaSum 
-    global betaIndexes 
-    global betaSum 
-    global alphaIndexes 
-    global alphaSum 
-    global thetaIndexes
-    global thetaSum
-    global deltaIndexes 
-    global deltaSum
-    
     global window
     global previousNumberValues
     global currentNumberValues
-    global currentIndex 
+    global currentIndex
     global numDiff
-    
+
     with urllib.request.urlopen('http://192.168.4.1/') as f: # Reads analog data from ESP
         y=f.read(2000)
         convData = y.decode("utf-8") # Convert from byte
-        
+
         # Get indexes of different data
         endIndex0 = convData.find(',')
         endIndex1 = convData.find(',', endIndex0+1)
         endIndex2 = convData.find(',', endIndex1+1)
         endIndex3 = len(convData)-1
 
-        if (endIndex0 > 0): # Checks that there is a comma 
-            values = values + [convData[i:i+n] for i in range(0, endIndex0-1, n)] # Break data into chunks of n chars
-            values1 = values1 + [convData[j:j+n] for j in range(endIndex0+1, endIndex1-1, n)]
-            values2 = values2 + [convData[k:k+n] for k in range(endIndex1+1, endIndex2-1, n)]
-            values3 = values3 + [convData[m:m+n] for m in range(endIndex2+1, endIndex3, n)]
-
+        if (endIndex0 > 0): # Checks that there is a comma
+            # Break data into chunks of n chars
+            elec1 = elec1 + [convData[i:i+n] for i in range(0, endIndex0-1, n)] # Differential input 1
+            elec2 = elec2 + [convData[j:j+n] for j in range(endIndex0+1, endIndex1-1, n)] # Differential input 2
+            accX = accX + [convData[k:k+n] for k in range(endIndex1+1, endIndex2-1, n)] # X-axis of accelerometer
+            accY = accY + [convData[m:m+n] for m in range(endIndex2+1, endIndex3, n)] # Y-axis of accelerometer
+            
             if (i%4 == 0): # Only graph data every 4 iterations
-                currentNumberValues = len(values)
+                currentNumberValues = len(elec1)
                 numDiff = currentNumberValues - previousNumberValues                        
-                currentIndex = currentNumberValues-1;
+                currentIndex = currentNumberValues-1
 
-                # Fourier Transform 
-                ps = np.abs(np.fft.fft(values[previousNumberValues:currentNumberValues]))**2 # only fft the most recent values
-                freqs = np.fft.fftfreq(numDiff, time_step)
-                idx = np.argsort(freqs)
-
-                # Comparison of Frequencies
-                for i in range (0, len(freqs[idx])):
-                    if(freqs[idx][i] > 30 and freqs[idx][i] <= 50): # Gamma frequencies
-                        gammaSum += ps[idx][i]
-                    elif(freqs[idx][i] > 14 and freqs[idx][i] <= 30): # Beta frequencies
-                            betaSum += ps[idx][i]
-                    elif(freqs[idx][i] > 8 and freqs[idx][i] <= 14): # Alpha frequencies
-                        alphaSum += ps[idx][i]
-                    elif(freqs[idx][i] > 4 and freqs[idx][i] <= 8): # Theta frequencies
-                        thetaSum += ps[idx][i]
-                    elif(freqs[idx][i] >= 0.1 and freqs[idx][i] <= 4): # Delta frequencies
-                        deltaSum += ps[idx][i]
-
-                sums = [gammaSum, betaSum, alphaSum, thetaSum, deltaSum]
+                print(max(accX))
+                print(max(accY))
                 
-                # Plot values
+                # Plot elec1 values
                 ax1.clear()
-                ax1.plot(values[previousNumberValues:currentNumberValues])
+                ax1.plot(elec1[previousNumberValues:currentNumberValues])
 
-                # Plot frequency spectrum
-                ax2.clear()
-                ax2.plot(freqs[idx], ps[idx]) # freqs[idx] go from -100 to 100 Hz
-                
-
-                # Plot comparison of frequencies
-                ind = np.arange(len(sums))
-                width = 0.7
-                ax3.clear()
-                ax3.bar(ind, sums, width)
-                ax3.set_xticks(ind)
-                ax3.set_xticklabels(("Gamma", "Beta", "Alpha", "Theta", "Delta"))
+                # Plot elec2 values
+                ax2.claer()
+                ax2.plot(elec2[previousNumberValues:currentNumberValues])
 
                 previousNumberValues = currentNumberValues
                  
