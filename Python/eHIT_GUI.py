@@ -1,23 +1,102 @@
 
 import sys
-import urllib.request
+import urllib
+import json
+import pandas as pd
 import matplotlib
 import tkinter as tk
-from tkinter import ttk
-matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation 
+import matplotlib.animation as animation
 import numpy as np
 import pickle
+from tkinter import ttk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.figure import Figure
+from matplotlib import style
+from matplotlib import pyplot as plt
 from PIL import Image,ImageTk
 from numpy import fft
 from datetime import datetime
-from matplotlib import style
+
+matplotlib.use("TkAgg")
 print("Loading..")
 
 LARGE_FONT=("RobotoCondensed",12)
+TITLE_FONT=("Arial",12)
+style.use("ggplot")
+elec1=[]
+elec2=[]
+accX=[]
+accY=[]
+
+n = 3 # A data point comes every 3 chars
+time_step = 0.00675; # ESP samples 1 sample/6ms (adjust to get accurate FFT)
+window = 200;
+previousNumberValues = 0;
+currentNumberValues = 0;
+currentIndex = 0;
+numDiff = 0;
+
+f = Figure()
+a1 = f.add_subplot(1,2,1)
+a2 = f.add_subplot(1,2,2)
+
+def animate(i):
+    global elec1
+    global elec2
+    global accX
+    global accY
+
+    global n
+    global time_step
+    global window
+    global previousNumberValues
+    global currentNumberValues
+    global currentIndex
+    global numDiff
+
+    dataLink='http://192.168.4.1/'
+    data=urllib.request.urlopen(dataLink)
+    data=data.readall().decode("utf-8")
+
+    endIndex0 = data.find(',')
+    endIndex1 = data.find(',', endIndex0 + 1)
+    endIndex2 = data.find(',', endIndex1 + 1)
+    endIndex3 = len(data) - 1
+
+    if (endIndex0 > 0):  # Checks that there is a comma
+        # Break data into chunks of n chars
+        elec1 = elec1 + [data[i:i + n] for i in range(0, endIndex0 - 1, n)]  # Differential input 1
+        elec2 = elec2 + [data[j:j + n] for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
+        accX = accX + [data[k:k + n] for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
+        accY = accY + [data[m:m + n] for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
+
+        if (i % 4 == 0):  # Only graph data every 4 iterations
+            currentNumberValues = len(elec1)
+            numDiff = currentNumberValues - previousNumberValues
+            currentIndex = currentNumberValues - 1
+
+            print(max(accX))
+            print(max(accY))
+
+            # Plot elec1 values
+            a1.clear()
+            a1.plot(elec1[previousNumberValues:currentNumberValues],
+                    "r")
+            a1.set_xlabel("Time")
+            a1.set_ylabel("Magnitude")
+            title="EEG Input 1"
+            a1.set_title(title)
+
+            # Plot elec2 values
+            a2.clear()
+            a2.plot(elec2[previousNumberValues:currentNumberValues],
+                    "b")
+            a2.set_xlabel("Time")
+            a2.set_ylabel("Magnitude")
+            title="EEG Input 2"
+            a2.set_title(title)
+
+            previousNumberValues = currentNumberValues
 
 
 class eHIT(tk.Tk):
@@ -66,21 +145,26 @@ class baselinePage(tk.Frame):
         label.pack(pady=10, padx=10)
 
         # Plot EEG input
-        f=Figure(figsize=(5,5),dpi=100)
-        a=f.add_subplot(111)
-        a.plot([1,2,3,4,5,6,7,8],[5,3,4,3,7,8,2,1])
+
         canvas=FigureCanvasTkAgg(f,self)
         canvas.show()
         canvas.get_tk_widget().pack(side=tk.TOP,fill=tk.BOTH,expand=True)
 
+        toolbar=NavigationToolbar2TkAgg(canvas,self)
+        toolbar.update()
+        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        button1 = ttk.Button(self, text="View More On EEG Data",
-                            command=lambda: controller.show_frame(reportPage))
+        button1 = ttk.Button(self, text="Record Baseline",
+                             command=lambda: controller.show_frame(reportPage))
         button1.pack()
 
-        button2 = ttk.Button(self, text="Return to Home Page",
-                            command=lambda: controller.show_frame(homePage))
+        button2 = ttk.Button(self, text="View More On EEG Data",
+                            command=lambda: controller.show_frame(reportPage))
         button2.pack()
+
+        button3 = ttk.Button(self, text="Return to Home Page",
+                            command=lambda: controller.show_frame(homePage))
+        button3.pack()
 
 
 class reportPage(tk.Frame):
@@ -94,10 +178,14 @@ class reportPage(tk.Frame):
         button1.pack()
 
 
-
 app=eHIT()
-app.geometry("800x400")
+app.geometry("1366x768")
+ani=animation.FuncAnimation(f,animate,interval=1000)
 app.mainloop()
+
+
+
+
 
 
 
@@ -154,3 +242,38 @@ root.geometry("1000x600")
 app = Window(root)
 root.mainloop()
 '''
+
+def animate0(i):
+    pullData=open("test.txt","r").read()
+    dataList=pullData.split('\n')
+    xList=[]
+    yList=[]
+    for eachLine in dataList:
+        if len(eachLine)>1:
+            x,y=eachLine.split(',')
+            xList.append(int(x))
+            yList.append(int(y))
+    a.clear()
+    a.plot(xList,yList)
+    #a.xlabel("Time (s)")
+    #a.ylabel("Magnitude")
+
+def animate1(i):
+    dataLink = 'http://192.168.4.1/'
+    data = urllib.request.urlopen(dataLink)
+    data = data.readall().decode("utf-8")
+    data = json.loads(data)
+    data = data["btc_usd"]
+    data = pd.DataFrame(data)
+
+    buys = data[(data['type'] == "bid")]
+    buys["datestamp"] = np.array(buys["timestamp"]).astype("datetime64[s]")
+    buyDates = (buys["datestamp"]).tolist()
+
+    sells = data[(data['type'] == "ask")]
+    sells["datestamp"] = np.array(sells["timestamp"]).astype("datetime64[s]")
+    sellDates = (sells["datestamp"]).tolist()
+
+    a.clear()
+    a.plot_date(buyDates, buys["price"])
+    a.plot_date(sellDates, sells["price"])

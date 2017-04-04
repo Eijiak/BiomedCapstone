@@ -78,7 +78,7 @@ def animate(i):
                 ax1.plot(elec1[previousNumberValues:currentNumberValues])
 
                 # Plot elec2 values
-                ax2.claer()
+                ax2.clear()
                 ax2.plot(elec2[previousNumberValues:currentNumberValues])
 
                 previousNumberValues = currentNumberValues
