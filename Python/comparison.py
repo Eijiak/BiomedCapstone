@@ -15,10 +15,16 @@ def removeDC(signal, time_step):
 	return
 
 def isImpact(accX, accY):
-
+	# function looks at peak accelerometer values to determine
+	# if player incurred heav hit
+	# inputs - list of accelerometer values in X and Y direction
 	
-
-	return
+	# acceleromter zero-biased at 511 (theoretically)
+	# postive acelerometer values above 511 and vice versa
+	isImpact = (max(accX) > 542) or (min(accX) < 480) or (max(accY) > 542) or (min(accY) < 480)
+	
+	return isImpact
+	
 
 def compare(baseline1, baseline2, elec1, elec2, time_step):
 
@@ -169,14 +175,14 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	fig = plt.figure(figsize=(10,7))
 	
 	sub1 = fig.add_subplot(311)  # PSD of baseline
-	sub1.set_title('Power Spectral Density - Baseline')
+	sub1.set_title('Power Spectral Density - Baseline', fontsize = 16)
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('PSD[V^2/Hz]')
 	sub1.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub1.plot(freq, PSD_base)
 	
 	sub2 = fig.add_subplot(312)  # PSD of post-impact data
-	sub2.set_title('Power Spectral Density - Post-Impact')
+	sub2.set_title('Power Spectral Density - Post-Impact', fontsize = 16)
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('PSD[V^2/Hz]')
 	sub2.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
@@ -189,7 +195,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	sub3 = fig.add_subplot(313) 
 	rects1 = sub3.bar(ind, sumsBasePSD, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
-	sub3.set_title("Levels of Frequency Groups")
+	sub3.set_title("Levels of Frequency Groups", fontsize = 16)
 	sub3.set_xticks(ind + width / 2)
 	sub3.set_xticklabels(("Delta", "Theta", "Alpha", "Beta", "Gamma"))
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
@@ -302,14 +308,14 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	fig = plt.figure(figsize=(10,7))
 	
 	sub1 = fig.add_subplot(311)  # Coherence of baseline
-	sub1.set_title('Coherence plot - Baseline')
+	sub1.set_title('Coherence plot - Baseline', fontsize = 16)
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('Coherence')
 	sub1.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub1.plot(freq, C_base)
 	
 	sub2 = fig.add_subplot(312)  # Coherence of post-impact data
-	sub2.set_title('Coherence plot - Post-Impact')
+	sub2.set_title('Coherence plot - Post-Impact', fontsize = 16)
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('Coherence')
 	sub2.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
@@ -322,7 +328,7 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	sub3 = fig.add_subplot(313) 
 	rects1 = sub3.bar(ind, sumsBaseC, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactC, width, color='r')
-	sub3.set_title("Levels of Coherence in Frequency Groups")
+	sub3.set_title("Levels of Coherence in Frequency Groups", fontsize = 16)
 	sub3.set_xticks(ind + width / 2)
 	sub3.set_xticklabels(("Delta", "Theta", "Alpha", "Beta", "Gamma"))
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
