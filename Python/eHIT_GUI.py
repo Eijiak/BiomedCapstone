@@ -1,34 +1,44 @@
 
 import sys
 import urllib.request
+import matplotlib
+import tkinter as tk
+from tkinter import ttk
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation 
 import numpy as np
 import pickle
-import tkinter as tk
 from PIL import Image,ImageTk
 from numpy import fft
 from datetime import datetime
 from matplotlib import style
+print("Loading..")
 
 LARGE_FONT=("RobotoCondensed",12)
 
 
 class eHIT(tk.Tk):
     def __init__(self, *args, **kwargs):
+
         tk.Tk.__init__(self, *args, **kwargs)
+
+        tk.Tk.iconbitmap(self,default="logo.ico")
+        tk.Tk.wm_title(self,"eHIT")
+
         container=tk.Frame(self)
-
         container.pack(side="top", fill="both",expand=True)
-
         container.grid_rowconfigure(0,weight=1)
         container.grid_columnconfigure(0,weight=1)
 
         self.frames={}
-        frame = StartPage(container, self)
-        self.frames[StartPage]=frame
-        frame.grid(row=0,column=0, sticky="nsew")
-        self.show_frame(StartPage)
+        for F in (homePage,baselinePage,reportPage):
+            frame = F(container, self)
+            self.frames[F]=frame
+            frame.grid(row=0,column=0, sticky="nsew")
+        self.show_frame(homePage)
 
     def show_frame(self,cont):
         frame=self.frames[cont]
@@ -36,25 +46,61 @@ class eHIT(tk.Tk):
 
 
 
-class StartPage(tk.Frame):
+class homePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
-        label=tk.Label(self,text="eHIT", font=LARGE_FONT)
-        label.pack(pady=10,padx=10)
+        label1=ttk.Label(self,text="eHIT", font=LARGE_FONT)
+        label1.pack(pady=10,padx=10)
+        label2 = ttk.Label(self, text="EEG Head Injury Tool", font=LARGE_FONT)
+        label2.pack(pady=10, padx=10)
 
-        button1=tk.Button(self,text="Let's get started!",
+        button1=ttk.Button(self,text="Let's get started!",
                           command=lambda: controller.show_frame(baselinePage))
         button1.pack()
 
+
 class baselinePage(tk.Frame):
     def __init__(self,parent,controller):
+        tk.Frame.__init__(self, parent)
+        label = ttk.Label(self, text="Baseline Page", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
+
+        # Plot EEG input
+        f=Figure(figsize=(5,5),dpi=100)
+        a=f.add_subplot(111)
+        a.plot([1,2,3,4,5,6,7,8],[5,3,4,3,7,8,2,1])
+        canvas=FigureCanvasTkAgg(f,self)
+        canvas.show()
+        canvas.get_tk_widget().pack(side=tk.TOP,fill=tk.BOTH,expand=True)
+
+
+        button1 = ttk.Button(self, text="View More On EEG Data",
+                            command=lambda: controller.show_frame(reportPage))
+        button1.pack()
+
+        button2 = ttk.Button(self, text="Return to Home Page",
+                            command=lambda: controller.show_frame(homePage))
+        button2.pack()
+
+
+class reportPage(tk.Frame):
+    def __init__(self,parent,controller):
+        tk.Frame.__init__(self, parent)
+        label = ttk.Label(self, text="Concussion Report Page", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
+
+        button1 = ttk.Button(self, text="Return to Baseline",
+                            command=lambda: controller.show_frame(baselinePage))
+        button1.pack()
 
 
 
-print("Loading..")
 app=eHIT()
 app.geometry("800x400")
 app.mainloop()
+
+
+
 
 
 # Basic testing for window, buttons, and menus
