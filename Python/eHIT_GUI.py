@@ -2,7 +2,6 @@
 import sys
 import urllib
 import json
-import pandas as pd
 import matplotlib
 import tkinter as tk
 import matplotlib.animation as animation
@@ -31,6 +30,9 @@ elec2=[]
 accX=[]
 accY=[]
 
+elec1Baseline=[]
+elec2Baseline=[]
+
 n = 3 # A data point comes every 3 chars
 time_step = 0.00675; # ESP samples 1 sample/6ms (adjust to get accurate FFT)
 window = 200;
@@ -43,23 +45,15 @@ f = Figure()
 a1 = f.add_subplot(1,2,1)
 a2 = f.add_subplot(1,2,2)
 
-def animate(i):
+def getData():
     global elec1
     global elec2
     global accX
     global accY
 
-    global n
-    global time_step
-    global window
-    global previousNumberValues
-    global currentNumberValues
-    global currentIndex
-    global numDiff
-
-    dataLink='http://192.168.4.1/'
-    data=urllib.request.urlopen(dataLink)
-    data=data.readall().decode("utf-8")
+    dataLink = 'http://192.168.4.1/'
+    data = urllib.request.urlopen(dataLink)
+    data = data.readall().decode("utf-8")
 
     endIndex0 = data.find(',')
     endIndex1 = data.find(',', endIndex0 + 1)
@@ -71,7 +65,22 @@ def animate(i):
         elec1 = elec1 + [data[i:i + n] for i in range(0, endIndex0 - 1, n)]  # Differential input 1
         elec2 = elec2 + [data[j:j + n] for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
         accX = accX + [data[k:k + n] for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
-        accY = accY + [data[m:m + n] for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
+        accY = accY + [data[m:m + n] for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer\
+
+        return True
+    return False
+
+def animate(i):
+
+    global n
+    global time_step
+    global window
+    global previousNumberValues
+    global currentNumberValues
+    global currentIndex
+    global numDiff
+
+    if (getData()):
 
         if (i % 4 == 0):  # Only graph data every 4 iterations
             currentNumberValues = len(elec1)
@@ -100,6 +109,20 @@ def animate(i):
             a2.set_title(title)
 
             previousNumberValues = currentNumberValues
+    return
+
+def recordBaseline():
+    global elec1Baseline
+    global elec2Baseline
+    baselineIndex = currentIndex
+    baselineTime = 5000
+    while True:
+        ani = animation.FuncAnimation(f, animate, interval=1000)
+        if (currentIndex - baselineIndex >= baselineTime):
+            elec1Baseline = elec1[baselineIndex:(baselineIndex+baselineTime)]
+            elec2Baseline = elec2[baselineIndex:(baselineIndex + baselineTime)]
+            break
+
 
 def popupmsg(msg):
     popup=tk.Tk()
@@ -166,7 +189,6 @@ class baselinePage(tk.Frame):
         label.pack(pady=10, padx=10)
 
         # Plot EEG input
-
         canvas=FigureCanvasTkAgg(f,self)
         canvas.show()
         canvas.get_tk_widget().pack(side=tk.TOP,fill=tk.BOTH,expand=True)
@@ -176,7 +198,7 @@ class baselinePage(tk.Frame):
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         button1 = ttk.Button(self, text="Record Baseline",
-                             command=lambda: controller.show_frame(reportPage))
+                             command=lambda: controller.show_frame(recordBaseline))
         button1.pack()
 
         button2 = ttk.Button(self, text="View More On EEG Data",
