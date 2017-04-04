@@ -8,12 +8,6 @@ from datetime import datetime
 from matplotlib import style
 from scipy import signal
 
-def removeDC(signal, time_step):
-
-	fs = 1/time_step
-	
-	return
-
 def isImpact(accX, accY):
 	# function looks at peak accelerometer values to determine
 	# if player incurred heav hit
@@ -31,45 +25,39 @@ def compare(baseline1, baseline2, elec1, elec2, time_step):
 	warnCount = 0  # how many times we have weird frequency lelel changes
 	
 	warnValue = 10 # how many changes in frequency levels do we tolerate before sending out warning
-
-	# remove DC compnents
-	baseline1 = removeDC(baseline1, time_step)
-	baseline2 = removeDC(baseline2, time_step)
-	elec1 = removeDC(elec1, time_step)
-	elec2 = removeDC(elec2, time_step)
 	
 	# freq is the same for everything
 	
 	# collect power spectral density related statistics
 	# PSD for each differential eeg input pair
 	# see ft_compare() for more details
-	freq, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1, relDiffPSD1 = ft_compare(baseline1, elec1, time_step)
-	freq, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2, relDiffPSD2 = ft_compare(baseline2, elec2, time_step)
+	freq1, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1, relDiffPSD1 = ft_compare(baseline1, elec1, time_step)
+	freq2, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2, relDiffPSD2 = ft_compare(baseline2, elec2, time_step)
 	
 	# collect coherence related statistics
 	# coherence for baseline and post-impact
 	# see xcoh_compare() for more details
-	freqBase, C_base, C_impact, sumsBaseC, sumsImpactC, relDiffC = xcoh_compare(baseline1, baseine2, elec1, elec2, time_step)
+	freqC, C_base, C_impact, sumsBaseC, sumsImpactC, relDiffC = xcoh_compare(baseline1, baseline2, elec1, elec2, time_step)
 	
 	# go through the relative differences in frequency level and 
 	# increment warnCount if relDiff >= 0.8 for psd and relDiff >= 0.5 for coherence
 	for i in range(0,5):
 		if (relDiffPSD1[i] >= 0.8):
 			warnCount += 1
-	for j in range(0.5):
+	for j in range(0,5):
 		if (relDiffPSD2[j] >= 0.8):
 			warnCount += 1
-	for k in range(0.5):
+	for k in range(0,5):
 		if (relDiffC[k] >= 0.5):
 			warnCount += 1
 	
 	# send out warning if there are too many frequency level changes	
-	if (warnCount >= 10):
+	if (warnCount >= 2):
 		# <inster warning msg code>
 		# <code for saving all PSD and coherence data
-		ft_plot(freq, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1)
-		ft_plot(freq, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2)
-		xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC)
+		ft_plot(freq1, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1)
+		ft_plot(freq2, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2)
+		xcoh_plot(freqC, C_base, C_impact, sumsBaseC, sumsImpactC)
 		
 	return
 
@@ -153,7 +141,7 @@ def ft_compare(baseline, elec, time_step):
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
 	relDiff = range(0,5)
-	for k in range(0, 4):
+	for k in range(0,5):
 		relDiff[k] = (abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k]
 		
 	return freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff
@@ -287,8 +275,8 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
 	relDiff = range(0,5)
-	for k in range(0, 4):
-		relDiff[k] = (abs(sumsBase[k] - sumsImpact[k]))/sumsBase
+	for k in range(0,5):
+		relDiff[k] = (abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k]
 		
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 
