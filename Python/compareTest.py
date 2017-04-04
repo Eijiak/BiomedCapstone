@@ -60,5 +60,9 @@ sig4 += (2*np.sqrt(3))*np.sin(2*np.pi*freq7*time) #theta
 sig4 += (2*np.sqrt(5))*np.sin(2*np.pi*freq10*time) #delta
 sig4 += np.random.normal(scale=np.sqrt(noise_power), size=time.shape) #add noise
 
+freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff = comparison.ft_compare(sig1, sig4, 0.006)
+comparison.ft_plot(freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact)
 
+freq, C_base, C_impact, sumsBase, sumsImpact, relDiff = comparison.xcoh_compare(sig1, sig3, sig2, sig4, 0.006)
+comparison.xcoh_plot(freq, C_base, C_impact, sumsBase, sumsImpact)
 

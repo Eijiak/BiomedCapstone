@@ -14,7 +14,9 @@ def removeDC(signal, time_step):
 	
 	return
 
-def isImpact():
+def isImpact(accX, accY):
+
+	
 
 	return
 
@@ -126,7 +128,7 @@ def ft_compare(baseline, elec, time_step):
 		elif ((freqBase[i] >= 1) and (freqBase[i] <= 4)): #delta
 			deltaSumBase += PSD_base[i]
 			
-	sumsBase = [gammaSumBase, betaSumBase, alphaSumBase, thetaSumBase, deltaSumBase]
+	sumsBase = [deltaSumBase, thetaSumBase, alphaSumBase, betaSumBase, gammaSumBase]
 	
 	for j in range(0,len(freqImpact)):
 		if ((freqImpact[j] > 30) and (freqImpact[j] <= 50)): #gamma
@@ -140,7 +142,7 @@ def ft_compare(baseline, elec, time_step):
 		elif ((freqImpact[j] >= 1) and (freqImpact[j] <= 4)): #delta
 			deltaSumImpact += PSD_impact[j]
 			
-	sumsImpact = [gammaSumImpact, betaSumImpact, alphaSumImpact, thetaSumImpact, deltaSumImpact]
+	sumsImpact = [deltaSumImpact, thetaSumImpact, alphaSumImpact, betaSumImpact, gammaSumImpact]
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
@@ -170,14 +172,14 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	sub1.set_title('Power Spectral Density - Baseline')
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('PSD[V^2/Hz]')
-	sub1.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub1.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub1.plot(freq, PSD_base)
 	
 	sub2 = fig.add_subplot(312)  # PSD of post-impact data
 	sub2.set_title('Power Spectral Density - Post-Impact')
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('PSD[V^2/Hz]')
-	sub2.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub2.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub2.plot(freq, PSD_impact)
 	
 	# levels of different frequency groups
@@ -189,7 +191,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
 	sub3.set_title("Levels of Frequency Groups")
 	sub3.set_xticks(ind + width / 2)
-	sub3.set_xticklabels(("Gamma", "Beta", "Alpha", "Theta", "Delta"))
+	sub3.set_xticklabels(("Delta", "Theta", "Alpha", "Beta", "Gamma"))
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
 	
 	plt.tight_layout()
@@ -260,7 +262,7 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 		elif ((freqBase[i] >= 1) and (freqBase[i] <= 4)): #delta
 			deltaSumBase += C_base[i]
 			
-	sumsBase = [gammaSumBase, betaSumBase, alphaSumBase, thetaSumBase, deltaSumBase]
+	sumsBase = [deltaSumBase, thetaSumBase, alphaSumBase, betaSumBase, gammaSumBase]
 	
 	for j in range(0,len(freqImpact)):
 		if ((freqImpact[j] > 30) and (freqImpact[j] <= 50)): #gamma
@@ -274,7 +276,7 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 		elif ((freqImpact[j] >= 1) and (freqImpact[j] <= 4)): #delta
 			deltaSumImpact += C_impact[j]
 			
-	sumsImpact = [gammaSumImpact, betaSumImpact, alphaSumImpact, thetaSumImpact, deltaSumImpact]
+	sumsImpact = [deltaSumImpact, thetaSumImpact, alphaSumImpact, betaSumImpact, gammaSumImpact]
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
@@ -303,14 +305,14 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	sub1.set_title('Coherence plot - Baseline')
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('Coherence')
-	sub1.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub1.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub1.plot(freq, C_base)
 	
 	sub2 = fig.add_subplot(312)  # Coherence of post-impact data
 	sub2.set_title('Coherence plot - Post-Impact')
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('Coherence')
-	sub2.set_xticks([-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60])
+	sub2.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub2.plot(freq, C_impact)
 	
 	# levels of Coherence in different frequency groups
@@ -322,7 +324,7 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	rects2 = sub3.bar(ind + width, sumsImpactC, width, color='r')
 	sub3.set_title("Levels of Coherence in Frequency Groups")
 	sub3.set_xticks(ind + width / 2)
-	sub3.set_xticklabels(("Gamma", "Beta", "Alpha", "Theta", "Delta"))
+	sub3.set_xticklabels(("Delta", "Theta", "Alpha", "Beta", "Gamma"))
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
 	
 	plt.tight_layout()
