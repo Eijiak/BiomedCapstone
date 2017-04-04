@@ -22,8 +22,8 @@ public class homeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    public void goToConfigure(View view) {
-        Intent intent = new Intent(this, configureActivity.class);
+    public void goToBaseline(View view) {
+        Intent intent = new Intent(this, baselineActivity.class);
         startActivity(intent);
     }
 
