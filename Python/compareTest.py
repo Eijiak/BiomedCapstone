@@ -75,9 +75,4 @@ sig5 += np.random.normal(scale=np.sqrt(noise_power), size=time.shape) #add noise
 sig5 += 150 #DC constant
 
 comparison.compare(sig1, sig3, sig2, sig4, 0.006)
-print 'liberty'
-print 'yogurt'
-print 'pinky'
-print 'monster'
-
-
+print ('liberty')

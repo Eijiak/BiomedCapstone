@@ -179,8 +179,8 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	# levels of different frequency groups
 	# display baseline and post-impact info in one bar graph
 	ind = np.arange(len(sumsBasePSD))
-        width = 0.15
-	sub3 = fig.add_subplot(313) 
+	width = 0.15
+	sub3 = fig.add_subplot(313)
 	rects1 = sub3.bar(ind, sumsBasePSD, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
 	sub3.set_title("Levels of Frequency Groups", fontsize = 16)
