@@ -20,8 +20,11 @@ from datetime import datetime
 matplotlib.use("TkAgg")
 print("Loading..")
 
-LARGE_FONT=("RobotoCondensed",12)
-TITLE_FONT=("Arial",12)
+LARGE_FONT=("Verdana",12)
+TITLE_FONT=("RobotCondensed",12)
+NORM_FONT=("Verdana",10)
+SMALL_FONT=("Verdana",8)
+
 style.use("ggplot")
 elec1=[]
 elec2=[]
@@ -98,6 +101,15 @@ def animate(i):
 
             previousNumberValues = currentNumberValues
 
+def popupmsg(msg):
+    popup=tk.Tk()
+    popup.wm_title("Error!")
+    label=ttk.Label(popup,text=msg,font=NORM_FONT)
+    label.pack(side="top",fill="x",pady=10)
+    B1=ttk.Button(popup,text="Okay",command=popup.destroy())
+    B1.pack()
+    popup.mainloop()
+
 
 class eHIT(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -112,6 +124,16 @@ class eHIT(tk.Tk):
         container.grid_rowconfigure(0,weight=1)
         container.grid_columnconfigure(0,weight=1)
 
+        menubar=tk.Menu(container)
+        filemenu=tk.Menu(menubar,tearoff=1)
+        filemenu.add_command(label="Save eHIT session",
+                             command=lambda:popupmsg("Not supported just yet!"))
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit",command=quit)
+        menubar.add_cascade(label="File",menu=filemenu)
+
+        tk.Tk.config(self,menu=menubar)
+
         self.frames={}
         for F in (homePage,baselinePage,reportPage):
             frame = F(container, self)
@@ -122,7 +144,6 @@ class eHIT(tk.Tk):
     def show_frame(self,cont):
         frame=self.frames[cont]
         frame.tkraise()
-
 
 
 class homePage(tk.Frame):
@@ -179,7 +200,7 @@ class reportPage(tk.Frame):
 
 
 app=eHIT()
-app.geometry("1366x768")
+app.geometry("1280x720")
 ani=animation.FuncAnimation(f,animate,interval=1000)
 app.mainloop()
 
