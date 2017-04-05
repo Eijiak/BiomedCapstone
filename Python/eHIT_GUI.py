@@ -37,12 +37,12 @@ elec1Impact=[]
 elec2Impact=[]
 
 n = 3 # A data point comes every 3 chars
-time_step = 0.00675; # ESP samples 1 sample/6ms (adjust to get accurate FFT)
-window = 200;
-previousNumberValues = 0;
-currentNumberValues = 0;
-currentIndex = 0;
-numDiff = 0;
+time_step = 0.00675 # ESP samples 1 sample/6ms (adjust to get accurate FFT)
+window = 200
+previousNumberValues = 0
+currentNumberValues = 0
+currentIndex = 0
+numDiff = 0
 
 f = Figure()
 a1 = f.add_subplot(1,2,1)
@@ -73,7 +73,7 @@ def getData():
         return True
     return False
 
-def animate(i):
+def plotData(i):
 
     global n
     global time_step
@@ -114,6 +114,7 @@ def animate(i):
 def recordBaseline():
     global elec1Baseline
     global elec2Baseline
+    print('got here')
     baselineIndex = currentIndex
     baselineTime = 500
     i = 0
@@ -121,7 +122,7 @@ def recordBaseline():
     while True:
         now = time.time()
         if(now-previousTime>0.001):
-            animate(i)
+            plotData(i)
             previousTime = now
             i=i+1
         if (currentIndex - baselineIndex >= baselineTime):
@@ -131,7 +132,12 @@ def recordBaseline():
             print(elec1Baseline)
             print(elec2Baseline)
             break
-
+    # recBasPopup = tk.Tk()
+    # recBasPopup.wm_title("Baseline done!")
+    # label = ttk.Label(recBasPopup, text="Baseline Done!", font=NORM_FONT)
+    # label.pack(side="top", fill="x", pady=10)
+    # recBasPopup.mainloop()
+    # recpopup.destroy()
 
 def popupmsg(msg):
     popup=tk.Tk()
@@ -142,6 +148,17 @@ def popupmsg(msg):
     B1.pack()
     popup.mainloop()
 
+def rec_and_pop():
+    recordBaseline()
+    recBasePopupMsg("Baseline recording completed!")
+
+
+def recBasePopupMsg(msg):
+    recpopup=tk.Tk()
+    recpopup.wm_title("Baseline completed!")
+    label=ttk.Label(recpopup,text=msg,font=NORM_FONT)
+    label.pack(side="top",fill="x",pady=10)
+    recpopup.mainloop()
 
 class eHIT(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -207,7 +224,7 @@ class baselinePage(tk.Frame):
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         button1 = ttk.Button(self, text="Record Baseline",
-                             command=lambda: recordBaseline())
+                             command=lambda: rec_and_pop())
         button1.pack()
 
         button2 = ttk.Button(self, text="View More On EEG Data",
@@ -234,7 +251,7 @@ class reportPage(tk.Frame):
 
 app=eHIT()
 app.geometry("1280x720")
-ani=animation.FuncAnimation(f,animate,interval=1000)
+ani=animation.FuncAnimation(f,plotData,interval=1000)
 app.mainloop()
 
 
