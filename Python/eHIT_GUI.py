@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
 from numpy import fft
 from datetime import datetime
 import time
+import comparison
 
 matplotlib.use("TkAgg")
 print("Loading..")
@@ -43,6 +44,8 @@ previousNumberValues = 0
 currentNumberValues = 0
 currentIndex = 0
 numDiff = 0
+impactIndex = 0
+isConky = False
 
 f = Figure()
 a1 = f.add_subplot(1,2,1)
@@ -67,8 +70,8 @@ def getData():
         # Break data into chunks of n chars
         elec1 = elec1 + [data[i:i + n] for i in range(0, endIndex0 - 1, n)]  # Differential input 1
         elec2 = elec2 + [data[j:j + n] for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
-        accX = accX + [data[k:k + n] for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
-        accY = accY + [data[m:m + n] for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer\
+        accX = accX + [float(data[k:k + n]) for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
+        accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer\
 
         return True
     return False
@@ -82,9 +85,16 @@ def plotData(i):
     global currentNumberValues
     global currentIndex
     global numDiff
+    global impactIndex
+    global accX
+    global accY
+    global isConky
 
     if (getData()):
-
+        if (isConky != True):
+            impactIndex = comparison.isImpact(accX, accY)
+            if (impactIndex >= 0):
+                isConky = True
         if (i % 4 == 0):  # Only graph data every 4 iterations
             currentNumberValues = len(elec1)
             numDiff = currentNumberValues - previousNumberValues
@@ -151,7 +161,6 @@ def popupmsg(msg):
 def rec_and_pop():
     recordBaseline()
     recBasePopupMsg("Baseline recording completed!")
-
 
 def recBasePopupMsg(msg):
     recpopup=tk.Tk()

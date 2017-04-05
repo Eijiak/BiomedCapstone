@@ -15,10 +15,19 @@ def isImpact(accX, accY):
 	
 	# acceleromter zero-biased at 511 (theoretically)
 	# postive acelerometer values above 511 and vice versa
-	isImpact = (max(accX) > 542) or (min(accX) < 480) or (max(accY) > 542) or (min(accY) < 480)
-	
-	return isImpact
-	
+	minThresh = 200
+	maxThresh = 600
+	print (type(max(accX)))
+	if (max(accX) > maxThresh):
+		return accX.index(max(accX))
+	elif (min(accX) < minThresh):
+		return accX.index(min(accX))
+	elif (max(accY) > maxThresh):
+		return accY.index(max(accY))
+	elif (min(accY) < minThresh):
+		return accY.index(min(accY))
+	else:
+		return -1
 
 def compare(baseline1, baseline2, elec1, elec2, time_step):
 
@@ -140,9 +149,9 @@ def ft_compare(baseline, elec, time_step):
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
-	relDiff = range(0,5)
+	relDiff = []
 	for k in range(0,5):
-		relDiff[k] = (abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k]
+		relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
 		
 	return freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff
 		
@@ -274,9 +283,9 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
-	relDiff = range(0,5)
+	relDiff = []
 	for k in range(0,5):
-		relDiff[k] = (abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k]
+		relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
 		
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 
