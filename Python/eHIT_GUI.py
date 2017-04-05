@@ -12,9 +12,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.figure import Figure
 from matplotlib import style
 from matplotlib import pyplot as plt
-from PIL import Image,ImageTk
+#from PIL import Image,ImageTk
 from numpy import fft
 from datetime import datetime
+import time
 
 matplotlib.use("TkAgg")
 print("Loading..")
@@ -32,6 +33,8 @@ accY=[]
 
 elec1Baseline=[]
 elec2Baseline=[]
+elec1Impact=[]
+elec2Impact=[]
 
 n = 3 # A data point comes every 3 chars
 time_step = 0.00675; # ESP samples 1 sample/6ms (adjust to get accurate FFT)
@@ -87,9 +90,6 @@ def animate(i):
             numDiff = currentNumberValues - previousNumberValues
             currentIndex = currentNumberValues - 1
 
-            print(max(accX))
-            print(max(accY))
-
             # Plot elec1 values
             a1.clear()
             a1.plot(elec1[previousNumberValues:currentNumberValues],
@@ -115,12 +115,21 @@ def recordBaseline():
     global elec1Baseline
     global elec2Baseline
     baselineIndex = currentIndex
-    baselineTime = 5000
+    baselineTime = 500
+    i = 0
+    previousTime = time.time()
     while True:
-        ani = animation.FuncAnimation(f, animate, interval=1000)
+        now = time.time()
+        if(now-previousTime>0.001):
+            animate(i)
+            previousTime = now
+            i=i+1
         if (currentIndex - baselineIndex >= baselineTime):
             elec1Baseline = elec1[baselineIndex:(baselineIndex+baselineTime)]
             elec2Baseline = elec2[baselineIndex:(baselineIndex + baselineTime)]
+            print('Recorded baseline!')
+            print(elec1Baseline)
+            print(elec2Baseline)
             break
 
 
@@ -198,7 +207,7 @@ class baselinePage(tk.Frame):
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         button1 = ttk.Button(self, text="Record Baseline",
-                             command=lambda: controller.show_frame(recordBaseline))
+                             command=lambda: recordBaseline())
         button1.pack()
 
         button2 = ttk.Button(self, text="View More On EEG Data",
@@ -208,6 +217,8 @@ class baselinePage(tk.Frame):
         button3 = ttk.Button(self, text="Return to Home Page",
                             command=lambda: controller.show_frame(homePage))
         button3.pack()
+
+        print ('hi')
 
 
 class reportPage(tk.Frame):
