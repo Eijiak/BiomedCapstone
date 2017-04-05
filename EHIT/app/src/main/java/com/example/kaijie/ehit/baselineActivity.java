@@ -6,16 +6,56 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class baselineActivity extends AppCompatActivity {
+    private static final String TAG = "baselineActivity";
+    PointsGraphSeries<DataPoint> xyseries;
 
+    private Button btnAddPt;
+
+    private EditText mX,mY;
+
+    GraphView mScatterPlot;
+
+    private ArrayList<XYValue> xyValues;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_baseline);
+
+        btnAddPt = (Button) findViewById(R.id.btnAddPt);
+        mX=(EditText) findViewById(R.id.numX);
+        mY=(EditText) findViewById(R.id.numY);
+        mScatterPlot = (GraphView) findViewById(R.id.scatterPlot);
+        xyValueArray = new ArrayList<>();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
     private LineGraphSeries<DataPoint> series;
     private static final Random RANDOM = new Random();
     private int lastX=0;
@@ -75,7 +115,7 @@ public class baselineActivity extends AppCompatActivity {
 
     }
 
-
+*/
 }
 
 

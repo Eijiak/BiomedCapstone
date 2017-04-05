@@ -1,4 +1,3 @@
-
 import sys
 import urllib
 import json
@@ -11,7 +10,7 @@ from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from matplotlib import style
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 #from PIL import Image,ImageTk
 from numpy import fft
 from datetime import datetime
@@ -21,8 +20,9 @@ import comparison
 matplotlib.use("TkAgg")
 print("Loading..")
 
+HUGE_FONT=("RobotoCondensed",30)
 LARGE_FONT=("Verdana",12)
-TITLE_FONT=("RobotCondensed",12)
+TITLE_FONT=("RobotoCondensed",12)
 NORM_FONT=("Verdana",10)
 SMALL_FONT=("Verdana",8)
 
@@ -46,10 +46,19 @@ currentIndex = 0
 numDiff = 0
 impactIndex = 0
 isConky = False
+recordTime = 500
+impactDataRecorded = False
 
-f = Figure()
-a1 = f.add_subplot(1,2,1)
-a2 = f.add_subplot(1,2,2)
+# Figure for main page
+mainFig = Figure()
+a1 = mainFig.add_subplot(121)
+a2 = mainFig.add_subplot(122)
+
+# Figure for report page
+reportFig = plt.figure(figsize=(10,7))
+sub1 = reportFig.add_subplot(311)
+sub2 = reportFig.add_subplot(312)
+sub3 = reportFig.add_subplot(313)
 
 def getData():
     global elec1
@@ -68,11 +77,11 @@ def getData():
 
     if (endIndex0 > 0):  # Checks that there is a comma
         # Break data into chunks of n chars
-        elec1 = elec1 + [data[i:i + n] for i in range(0, endIndex0 - 1, n)]  # Differential input 1
-        elec2 = elec2 + [data[j:j + n] for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
+        elec1 = elec1 + [float(data[i:i + n]) for i in range(0, endIndex0 - 1, n)]  # Differential input 1
+        elec2 = elec2 + [float(data[j:j + n]) for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
         accX = accX + [float(data[k:k + n]) for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
-        accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer\
-
+        accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
+        # print(str(max(accX)) + " " + str(max(accY)))
         return True
     return False
 
@@ -89,13 +98,37 @@ def plotData(i):
     global accX
     global accY
     global isConky
+    global elec1Impact
+    global elec2Impact
+    global impactDataRecorded
+    global sub1
+    global sub2
+    global sub3
+    global reportFig
 
     if (getData()):
-        if (isConky != True):
+        print("getting data")
+        # Impact Checking
+        if (isConky != True and impactDataRecorded != True):
             impactIndex = comparison.isImpact(accX, accY)
             if (impactIndex >= 0):
+                impactText = mainFig.text(0.5, 0.5, "Impact Detected!", fontsize=40, ha='center',
+                                          bbox={'facecolor': 'red', 'alpha': 0.8, 'pad': 10})
+                print("done impact fcn")
                 isConky = True
-        if (i % 4 == 0):  # Only graph data every 4 iterations
+        if (isConky):
+            if(currentIndex - impactIndex > recordTime):
+                elec1Impact = elec1[impactIndex:(impactIndex + recordTime)]
+                elec2Impact = elec2[impactIndex:(impactIndex + recordTime)]
+                comparison.compare(elec1Baseline, elec2Baseline, elec1Impact, elec2Impact, 0.006, reportFig, sub1, sub2, sub3)
+                print('Recorded impact!')
+                print(elec1Impact)
+                print(elec2Impact)
+                isConky = False
+                impactDataRecorded = True
+
+        # Data plotting
+        if (i % 3 == 0):  # Only graph data every 3 iterations
             currentNumberValues = len(elec1)
             numDiff = currentNumberValues - previousNumberValues
             currentIndex = currentNumberValues - 1
@@ -124,9 +157,9 @@ def plotData(i):
 def recordBaseline():
     global elec1Baseline
     global elec2Baseline
+    global recordTime
     print('got here')
     baselineIndex = currentIndex
-    baselineTime = 500
     i = 0
     previousTime = time.time()
     while True:
@@ -135,9 +168,9 @@ def recordBaseline():
             plotData(i)
             previousTime = now
             i=i+1
-        if (currentIndex - baselineIndex >= baselineTime):
-            elec1Baseline = elec1[baselineIndex:(baselineIndex+baselineTime)]
-            elec2Baseline = elec2[baselineIndex:(baselineIndex + baselineTime)]
+        if (currentIndex - baselineIndex >= recordTime):
+            elec1Baseline = elec1[baselineIndex:(baselineIndex+recordTime)]
+            elec2Baseline = elec2[baselineIndex:(baselineIndex + recordTime)]
             print('Recorded baseline!')
             print(elec1Baseline)
             print(elec2Baseline)
@@ -167,6 +200,7 @@ def recBasePopupMsg(msg):
     recpopup.wm_title("Baseline completed!")
     label=ttk.Label(recpopup,text=msg,font=NORM_FONT)
     label.pack(side="top",fill="x",pady=10)
+    recpopup.after(2000, lambda: recpopup.destroy())
     recpopup.mainloop()
 
 class eHIT(tk.Tk):
@@ -184,8 +218,8 @@ class eHIT(tk.Tk):
 
         menubar=tk.Menu(container)
         filemenu=tk.Menu(menubar,tearoff=1)
-        filemenu.add_command(label="Save eHIT session",
-                             command=lambda:popupmsg("Not supported just yet!"))
+        filemenu.add_command(label="Main Page",
+                             command=lambda:self.show_frame(mainPage))
         filemenu.add_separator()
         filemenu.add_command(label="Exit",command=quit)
         menubar.add_cascade(label="File",menu=filemenu)
@@ -193,7 +227,7 @@ class eHIT(tk.Tk):
         tk.Tk.config(self,menu=menubar)
 
         self.frames={}
-        for F in (homePage,baselinePage,reportPage):
+        for F in (homePage,mainPage,reportPage):
             frame = F(container, self)
             self.frames[F]=frame
             frame.grid(row=0,column=0, sticky="nsew")
@@ -213,24 +247,33 @@ class homePage(tk.Frame):
         label2.pack(pady=10, padx=10)
 
         button1=ttk.Button(self,text="Let's get started!",
-                          command=lambda: controller.show_frame(baselinePage))
+                          command=lambda: controller.show_frame(mainPage))
         button1.pack()
 
+    def homeLoop(self, parent, controller):
+        global isConky
+        if(isConky):
+            print ("concussion!")
+        else:
+            print("no concussion!")
+        self.after(1000, self.homeLoop())
 
-class baselinePage(tk.Frame):
+
+class mainPage(tk.Frame):
     def __init__(self,parent,controller):
         tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text="Baseline Page", font=LARGE_FONT)
+        label = ttk.Label(self, text="Main Page", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         # Plot EEG input
-        canvas=FigureCanvasTkAgg(f,self)
-        canvas.show()
-        canvas.get_tk_widget().pack(side=tk.TOP,fill=tk.BOTH,expand=True)
+        mainCanvas=FigureCanvasTkAgg(mainFig,self)
+        mainCanvas.show()
+        mainCanvas.get_tk_widget().pack(side=tk.TOP,fill=tk.BOTH,expand=True)
 
-        toolbar=NavigationToolbar2TkAgg(canvas,self)
+
+        toolbar=NavigationToolbar2TkAgg(mainCanvas,self)
         toolbar.update()
-        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        mainCanvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         button1 = ttk.Button(self, text="Record Baseline",
                              command=lambda: rec_and_pop())
@@ -247,20 +290,27 @@ class baselinePage(tk.Frame):
         print ('hi')
 
 
+
 class reportPage(tk.Frame):
     def __init__(self,parent,controller):
         tk.Frame.__init__(self, parent)
         label = ttk.Label(self, text="Concussion Report Page", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
+        canvasReport = FigureCanvasTkAgg(reportFig, self)
+        canvasReport.show()
+        canvasReport.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        print("initializing report page")
+
         button1 = ttk.Button(self, text="Return to Baseline",
-                            command=lambda: controller.show_frame(baselinePage))
+                            command=lambda: controller.show_frame(mainPage))
         button1.pack()
 
 
 app=eHIT()
 app.geometry("1280x720")
-ani=animation.FuncAnimation(f,plotData,interval=1000)
+ani=animation.FuncAnimation(mainFig,plotData,interval=1000)
 app.mainloop()
 
 

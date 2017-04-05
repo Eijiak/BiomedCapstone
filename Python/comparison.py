@@ -15,9 +15,11 @@ def isImpact(accX, accY):
 	
 	# acceleromter zero-biased at 511 (theoretically)
 	# postive acelerometer values above 511 and vice versa
-	minThresh = 200
-	maxThresh = 600
-	print (type(max(accX)))
+
+	# experimentally determined resting values of 549 (accX) and 548 (accY)
+	minThresh = 546
+	maxThresh = 551
+
 	if (max(accX) > maxThresh):
 		return accX.index(max(accX))
 	elif (min(accX) < minThresh):
@@ -29,7 +31,7 @@ def isImpact(accX, accY):
 	else:
 		return -1
 
-def compare(baseline1, baseline2, elec1, elec2, time_step):
+def compare(baseline1, baseline2, elec1, elec2, time_step, fig, sub1, sub2, sub3):
 
 	warnCount = 0  # how many times we have weird frequency lelel changes
 	
@@ -64,9 +66,9 @@ def compare(baseline1, baseline2, elec1, elec2, time_step):
 	if (warnCount >= 2):
 		# <inster warning msg code>
 		# <code for saving all PSD and coherence data
-		ft_plot(freq1, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1)
-		ft_plot(freq2, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2)
-		xcoh_plot(freqC, C_base, C_impact, sumsBaseC, sumsImpactC)
+		ft_plot(freq1, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1, fig, sub1, sub2, sub3)
+		# ft_plot(freq2, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2)
+		# xcoh_plot(freqC, C_base, C_impact, sumsBaseC, sumsImpactC)
 		
 	return
 
@@ -156,7 +158,7 @@ def ft_compare(baseline, elec, time_step):
 	return freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff
 		
 	
-def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
+def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD, fig, sub1, sub2, sub3):
 	'''
 	function plots PSD of baseline and post-impact eeg data
 	also plots frequency groups in a bar graph
@@ -169,16 +171,16 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	sumsImpactPSD - list of gamma, beta, alpha, theta, delta levels - post-impact
 	'''
 
-	fig = plt.figure(figsize=(10,7))
+	# fig = plt.figure(figsize=(10,7))
 	
-	sub1 = fig.add_subplot(311)  # PSD of baseline
+	# sub1 = fig.add_subplot(311)  # PSD of baseline
 	sub1.set_title('Power Spectral Density - Baseline', fontsize = 16)
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('PSD[V^2/Hz]')
 	sub1.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub1.plot(freq, PSD_base)
 	
-	sub2 = fig.add_subplot(312)  # PSD of post-impact data
+	# sub2 = fig.add_subplot(312)  # PSD of post-impact data
 	sub2.set_title('Power Spectral Density - Post-Impact', fontsize = 16)
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('PSD[V^2/Hz]')
@@ -189,7 +191,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	# display baseline and post-impact info in one bar graph
 	ind = np.arange(len(sumsBasePSD))
 	width = 0.15
-	sub3 = fig.add_subplot(313)
+	# sub3 = fig.add_subplot(313)
 	rects1 = sub3.bar(ind, sumsBasePSD, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
 	sub3.set_title("Levels of Frequency Groups", fontsize = 16)
@@ -199,7 +201,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	
 	plt.tight_layout()
 	plt.ion()
-	plt.show()
+	#plt.show()
 	
 	return
 
@@ -332,15 +334,7 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
 	
 	plt.tight_layout()
-	plot.ion()
-	plt.show()
-	
-	return
-
-def closePlots():
-
-	plt.close()
-	plt.close()
-	plt.close()
+	plt.ion()
+	#plt.show()
 	
 	return
