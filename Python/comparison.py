@@ -189,6 +189,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
 	
 	plt.tight_layout()
+	plt.ion()
 	plt.show()
 	
 	return
@@ -322,7 +323,15 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
 	
 	plt.tight_layout()
+	plot.ion()
 	plt.show()
 	
 	return
 
+def closePlots():
+
+	plt.close()
+	plt.close()
+	plt.close()
+	
+	return
