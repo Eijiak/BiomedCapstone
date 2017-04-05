@@ -15,19 +15,10 @@ def isImpact(accX, accY):
 	
 	# acceleromter zero-biased at 511 (theoretically)
 	# postive acelerometer values above 511 and vice versa
-	minThresh = 200
-	maxThresh = 600
-	print (type(max(accX)))
-	if (max(accX) > maxThresh):
-		return accX.index(max(accX))
-	elif (min(accX) < minThresh):
-		return accX.index(min(accX))
-	elif (max(accY) > maxThresh):
-		return accY.index(max(accY))
-	elif (min(accY) < minThresh):
-		return accY.index(min(accY))
-	else:
-		return -1
+	isImpact = (max(accX) > 542) or (min(accX) < 480) or (max(accY) > 542) or (min(accY) < 480)
+	
+	return isImpact
+	
 
 def compare(baseline1, baseline2, elec1, elec2, time_step):
 
@@ -149,9 +140,9 @@ def ft_compare(baseline, elec, time_step):
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
-	relDiff = []
+	relDiff = list(range(0,5))
 	for k in range(0,5):
-		relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
+		relDiff[k] = (abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k]
 		
 	return freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff
 		
@@ -189,7 +180,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD):
 	# display baseline and post-impact info in one bar graph
 	ind = np.arange(len(sumsBasePSD))
 	width = 0.15
-	sub3 = fig.add_subplot(313)
+	sub3 = fig.add_subplot(313) 
 	rects1 = sub3.bar(ind, sumsBasePSD, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactPSD, width, color='r')
 	sub3.set_title("Levels of Frequency Groups", fontsize = 16)
@@ -283,9 +274,9 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
-	relDiff = []
+	relDiff = list(range(0,5))
 	for k in range(0,5):
-		relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
+		relDiff[k] = (abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k]
 		
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 
