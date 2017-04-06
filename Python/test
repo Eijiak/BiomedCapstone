@@ -1,0 +1,6 @@
+data = "1231,"
+endIndex0=data.find(",")
+n=3
+elec1 = []
+elec1 = elec1 + [float(data[i:i + n]) for i in range(0, endIndex0 - 1, n)]
+print(elec1)

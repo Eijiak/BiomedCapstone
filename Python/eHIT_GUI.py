@@ -47,7 +47,7 @@ currentIndex = 0
 numDiff = 0
 impactIndex = 0
 isConky = False
-recordTime = 500
+recordTime = 250
 impactDataRecorded = False
 
 # Figure for main page
@@ -60,26 +60,26 @@ reportFigPSD1 = plt.figure()
 subPSD11 = reportFigPSD1.add_subplot(311)
 subPSD12 = reportFigPSD1.add_subplot(312)
 subPSD13 = reportFigPSD1.add_subplot(313)
-plt.tight_layout()
+# plt.tight_layout()
 
 reportFigPSD2 = plt.figure()
 subPSD21 = reportFigPSD2.add_subplot(311)
 subPSD22 = reportFigPSD2.add_subplot(312)
 subPSD23 = reportFigPSD2.add_subplot(313)
-plt.tight_layout()
+# plt.tight_layout()
 
 reportFigC = plt.figure()
 subC1 = reportFigC.add_subplot(311)
 subC2 = reportFigC.add_subplot(312)
 subC3 = reportFigC.add_subplot(313)
-plt.tight_layout()
+# plt.tight_layout()
 
 def getData():
     global elec1
     global elec2
     global accX
     global accY
-
+    print("getting data")
     dataLink = 'http://192.168.4.1/'
     data = urllib.request.urlopen(dataLink)
     data = data.readall().decode("utf-8")
@@ -90,13 +90,16 @@ def getData():
     endIndex3 = len(data) - 1
 
     if (endIndex0 > 0):  # Checks that there is a comma
-        # Break data into chunks of n chars
-        elec1 = elec1 + [float(data[i:i + n]) for i in range(0, endIndex0 - 1, n)]  # Differential input 1
-        elec2 = elec2 + [float(data[j:j + n]) for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
-        accX = accX + [float(data[k:k + n]) for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
-        accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
-        # print(str(max(accX)) + " " + str(max(accY)))
-        return True
+        if (endIndex0 % 3 == 0 and (endIndex1-endIndex0-1) % 3 == 0 and (endIndex2-endIndex1-1) % 3 == 0 and (endIndex3-endIndex2) % 3 == 0):
+            # Break data into chunks of n chars
+            elec1 = elec1 + [float(data[i:i + n]) for i in range(0, endIndex0 - 1, n)]  # Differential input 1
+            elec2 = elec2 + [float(data[j:j + n]) for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
+            accX = accX + [float(data[k:k + n]) for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
+            accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
+            elec1 = comparison.butter_bandpass_filter(elec1, 1, 40, 0.00675)
+            print(type(elec1))
+            # print(str(max(accX)) + " " + str(max(accY)))
+            return True
     return False
 
 def plotData(i):
@@ -129,7 +132,7 @@ def plotData(i):
     global reportFigC
 
     if (getData()):
-        print("getting data")
+
         # Impact Checking
         if (isConky != True and impactDataRecorded != True):
             impactIndex = comparison.isImpact(accX, accY)
@@ -142,7 +145,7 @@ def plotData(i):
             if(currentIndex - impactIndex > recordTime):
                 elec1Impact = elec1[impactIndex:(impactIndex + recordTime)]
                 elec2Impact = elec2[impactIndex:(impactIndex + recordTime)]
-                comparison.compare(elec1Baseline, elec2Baseline, elec1Impact, elec2Impact, 0.006, reportFigPSD1, subPSD11, subPSD12, subPSD13, reportFigPSD2, subPSD21, subPSD22, subPSD23, reportFigC, subC1, subC2, subC3)
+                comparison.compare(elec1Baseline, elec2Baseline, elec1Impact, elec2Impact, 0.00675, reportFigPSD1, subPSD11, subPSD12, subPSD13, reportFigPSD2, subPSD21, subPSD22, subPSD23, reportFigC, subC1, subC2, subC3)
                 print('Recorded impact!')
                 print(elec1Impact)
                 print(elec2Impact)
@@ -157,7 +160,10 @@ def plotData(i):
 
             # Plot elec1 values
             a1.clear()
-            a1.plot(elec1[previousNumberValues:currentNumberValues],
+            timeValues = list(range(previousNumberValues, currentNumberValues))
+            for i in timeValues:
+                i = i*time_step
+            a1.plot(timeValues,elec1[previousNumberValues:currentNumberValues],
                     "r")
             a1.set_xlabel("Time")
             a1.set_ylabel("Magnitude")

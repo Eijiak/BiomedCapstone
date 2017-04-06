@@ -12,7 +12,7 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
     low = lowcut / nyq
     high = highcut / nyq
-    b, a = butter(order, [low, high], btype='band')
+    b, a = signal.butter(order, [low, high], btype='band')
     return b, a
 
 
@@ -20,9 +20,9 @@ def butter_bandpass_filter(data, lowcut, highcut, Ts, order=5):
 	#this is the function you're using
 
 	fs = 1/Ts
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = lfilter(b, a, data)
-    return y
+	b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+	y = signal.lfilter(b, a, data)
+	return y.tolist()
 
 def isImpact(accX, accY):
 	# function looks at peak accelerometer values to determine
