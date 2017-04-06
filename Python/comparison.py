@@ -174,7 +174,10 @@ def ft_compare(baseline, elec, time_step):
 	# of baseline and post-impact
 	relDiff = []
 	for k in range(0,5):
-		relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
+		if (sumsBase[k]>0):
+			relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
+		else:
+			relDiff.append(0)
 		
 	return freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff
 		
@@ -307,9 +310,9 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
-	relDiff = []
+	relDiff = list(range(0,5))
 	for k in range(0,5):
-		relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
+		relDiff[k] = ((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
 		
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 

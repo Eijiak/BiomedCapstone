@@ -97,8 +97,7 @@ def getData():
             accX = accX + [float(data[k:k + n]) for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
             accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
             elec1 = comparison.butter_bandpass_filter(elec1, 1, 40, 0.00675)
-            print(type(elec1))
-            # print(str(max(accX)) + " " + str(max(accY)))
+            elec2 = comparison.butter_bandpass_filter(elec2, 1, 40, 0.00675)
             return True
     return False
 
@@ -161,8 +160,9 @@ def plotData(i):
             # Plot elec1 values
             a1.clear()
             timeValues = list(range(previousNumberValues, currentNumberValues))
-            for i in range(0,timeValues):
+            for i in range(0,len(timeValues)):
                 timeValues[i] = timeValues[i]*time_step
+            timeValues = list(timeValues)
             a1.plot(timeValues,elec1[previousNumberValues:currentNumberValues],
                     "r")
             a1.set_xlabel("Time")
