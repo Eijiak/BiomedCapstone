@@ -17,6 +17,7 @@ from datetime import datetime
 import time
 import comparison
 
+
 matplotlib.use("TkAgg")
 print("Loading..")
 
@@ -55,10 +56,23 @@ a1 = mainFig.add_subplot(121)
 a2 = mainFig.add_subplot(122)
 
 # Figure for report page
-reportFig = plt.figure(figsize=(10,7))
-sub1 = reportFig.add_subplot(311)
-sub2 = reportFig.add_subplot(312)
-sub3 = reportFig.add_subplot(313)
+reportFigPSD1 = plt.figure()
+subPSD11 = reportFigPSD1.add_subplot(311)
+subPSD12 = reportFigPSD1.add_subplot(312)
+subPSD13 = reportFigPSD1.add_subplot(313)
+plt.tight_layout()
+
+reportFigPSD2 = plt.figure()
+subPSD21 = reportFigPSD2.add_subplot(311)
+subPSD22 = reportFigPSD2.add_subplot(312)
+subPSD23 = reportFigPSD2.add_subplot(313)
+plt.tight_layout()
+
+reportFigC = plt.figure()
+subC1 = reportFigC.add_subplot(311)
+subC2 = reportFigC.add_subplot(312)
+subC3 = reportFigC.add_subplot(313)
+plt.tight_layout()
 
 def getData():
     global elec1
@@ -101,10 +115,18 @@ def plotData(i):
     global elec1Impact
     global elec2Impact
     global impactDataRecorded
-    global sub1
-    global sub2
-    global sub3
-    global reportFig
+    global subPSD11
+    global subPSD12
+    global subPSD13
+    global subPSD21
+    global subPSD22
+    global subPSD23
+    global subC1
+    global subC2
+    global subC3
+    global reportFigPSD1
+    global reportFigPSD2
+    global reportFigC
 
     if (getData()):
         print("getting data")
@@ -120,7 +142,7 @@ def plotData(i):
             if(currentIndex - impactIndex > recordTime):
                 elec1Impact = elec1[impactIndex:(impactIndex + recordTime)]
                 elec2Impact = elec2[impactIndex:(impactIndex + recordTime)]
-                comparison.compare(elec1Baseline, elec2Baseline, elec1Impact, elec2Impact, 0.006, reportFig, sub1, sub2, sub3)
+                comparison.compare(elec1Baseline, elec2Baseline, elec1Impact, elec2Impact, 0.006, reportFigPSD1, subPSD11, subPSD12, subPSD13, reportFigPSD2, subPSD21, subPSD22, subPSD23, reportFigC, subC1, subC2, subC3)
                 print('Recorded impact!')
                 print(elec1Impact)
                 print(elec2Impact)
@@ -227,7 +249,7 @@ class eHIT(tk.Tk):
         tk.Tk.config(self,menu=menubar)
 
         self.frames={}
-        for F in (homePage,mainPage,reportPage):
+        for F in (homePage,mainPage,reportPage1, reportPage2, reportPageC):
             frame = F(container, self)
             self.frames[F]=frame
             frame.grid(row=0,column=0, sticky="nsew")
@@ -270,43 +292,91 @@ class mainPage(tk.Frame):
         mainCanvas.show()
         mainCanvas.get_tk_widget().pack(side=tk.TOP,fill=tk.BOTH,expand=True)
 
-
+        # Matplotlib toolbar
         toolbar=NavigationToolbar2TkAgg(mainCanvas,self)
         toolbar.update()
         mainCanvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
+        # Buttons
         button1 = ttk.Button(self, text="Record Baseline",
                              command=lambda: rec_and_pop())
         button1.pack()
 
         button2 = ttk.Button(self, text="View More On EEG Data",
-                            command=lambda: controller.show_frame(reportPage))
+                            command=lambda: controller.show_frame(reportPage1))
         button2.pack()
 
-        button3 = ttk.Button(self, text="Return to Home Page",
-                            command=lambda: controller.show_frame(homePage))
-        button3.pack()
-
-        print ('hi')
-
-
-
-class reportPage(tk.Frame):
+class reportPage1(tk.Frame):
     def __init__(self,parent,controller):
         tk.Frame.__init__(self, parent)
         label = ttk.Label(self, text="Concussion Report Page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
+        label.grid(row=0)
 
-        canvasReport = FigureCanvasTkAgg(reportFig, self)
+        canvasReport = FigureCanvasTkAgg(reportFigPSD1, self)
         canvasReport.show()
-        canvasReport.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
+        canvasReport.get_tk_widget().grid(row=1, rowspan=3)
         print("initializing report page")
 
-        button1 = ttk.Button(self, text="Return to Baseline",
-                            command=lambda: controller.show_frame(mainPage))
-        button1.pack()
+        # Matplotlib toolbar
+        # toolbar = NavigationToolbar2TkAgg(canvasReport, self)
+        # toolbar.update()
+        canvasReport._tkcanvas.grid(row=1, rowspan=3)
 
+        ttk.Style().configure("RB.TButton", relief='flat', background='red')
+        button1 = tk.Button(self, text="Electrode 1 PSD Report", bg="#00aad4")
+        button1.grid(row=1, column=1, sticky="SWE", padx=10)
+
+        button2 = ttk.Button(self, text="Electrode 2 PSD Report",
+                             command=lambda: controller.show_frame(reportPage2))
+        button2.grid(row=2, column=1, sticky="WE", padx=10)
+
+        button3 = ttk.Button(self, text="Coherence Report",
+                             command=lambda: controller.show_frame(reportPageC))
+        button3.grid(row=3, column=1, sticky="NWE", padx=10)
+
+class reportPage2(tk.Frame):
+    def __init__(self,parent,controller):
+        tk.Frame.__init__(self, parent)
+        label = ttk.Label(self, text="Concussion Report Page", font=LARGE_FONT)
+        label.grid(row=0)
+
+        canvasReport = FigureCanvasTkAgg(reportFigPSD2, self)
+        canvasReport.show()
+        canvasReport.get_tk_widget().grid(row=1, rowspan=3)
+        canvasReport._tkcanvas.grid(row=1, rowspan=3)
+
+        button1 = ttk.Button(self, text="Electrode 1 PSD Report",
+                            command=lambda: controller.show_frame(reportPage1))
+        button1.grid(row=1, column=1, sticky="SWE", padx=10)
+
+        button2 = tk.Button(self, text="Electrode 2 PSD Report", bg='#00aad4')
+        button2.grid(row=2, column=1, sticky="WE", padx=10)
+
+        button3 = ttk.Button(self, text="Coherence Report",
+                             command=lambda: controller.show_frame(reportPageC))
+        button3.grid(row=3, column=1, sticky="NWE", padx=10)
+
+class reportPageC(tk.Frame):
+    def __init__(self,parent,controller):
+        tk.Frame.__init__(self, parent)
+
+
+        button1 = ttk.Button(self, text="Electrode 1 PSD Report",
+                            command=lambda: controller.show_frame(reportPage1))
+        button1.grid(row=1, column=1, sticky="SWE", padx=10)
+        label = ttk.Label(self, text="Concussion Report Page", font=LARGE_FONT)
+        label.grid(row=0)
+
+        canvasReport = FigureCanvasTkAgg(reportFigC, self)
+        canvasReport.show()
+        canvasReport.get_tk_widget().grid(row=1, rowspan=3)
+        canvasReport._tkcanvas.grid(row=1, rowspan=3)
+        button2 = ttk.Button(self, text="Electrode 2 PSD Report",
+                             command=lambda: controller.show_frame(reportPage2))
+        button2.grid(row=2, column=1, sticky="WE", padx=10)
+
+        button3 = tk.Button(self, text="Coherence Report", bg='#00aad4')
+        button3.grid(row=3, column=1, sticky="NWE", padx=10)
 
 app=eHIT()
 app.geometry("1280x720")
@@ -328,45 +398,34 @@ class Window(Frame):
         Frame.__init__(self,master)
         self.master=master
         self.init_window()
-
     def init_window(self):
         self.master.title("GUI")
         self.pack(fill=BOTH,expand=1)
-
-
         # Menu buttons
         menu=Menu(self.master)
         self.master.config(menu=menu)
-
         file=Menu(menu)
         file.add_command(label='Save')
         file.add_command(label='Exit',command=self.client_exit)
         menu.add_cascade(label='File',menu=file)
-
         edit=Menu(menu)
         edit.add_command(label='Show Logo',command=self.showImg)
         edit.add_command(label='Show Text', command=self.showTxt)
         menu.add_cascade(label='Edit',menu=edit)
-
         # Baseline Button
         baselineButton=Button(self,text="Take Baseline!")
         baselineButton.place(relx=0.5,rely=0.8,anchor=CENTER)
-
-
     def client_exit(self):
         exit()
-
     def showImg(self):
         load=Image.open('logo.png')
         render=ImageTk.PhotoImage(load)
         img=Label(self,image=render)
         img.image=render
         img.place(relx=0.5,rely=0.2,anchor=CENTER)
-
     def showTxt(self):
         text=Label(self,text='EEG Head Injury Tool')
         text.pack()
-
 root=Tk()
 root.geometry("1000x600")
 app = Window(root)

@@ -12,14 +12,18 @@ def isImpact(accX, accY):
 	# function looks at peak accelerometer values to determine
 	# if player incurred heav hit
 	# inputs - list of accelerometer values in X and Y direction
-	
-	# acceleromter zero-biased at 511 (theoretically)
-	# postive acelerometer values above 511 and vice versa
 
 	# experimentally determined resting values of 549 (accX) and 548 (accY)
 	minThresh = 546
 	maxThresh = 551
-
+	
+	# isImpactMax = ( max(accX) > maxThresh ) or ( max(accY) > maxThresh ) or ( min(accX) < minThresh ) or ( min(accY) < minThresh )
+	#
+	# return isImpact
+	
+	# branching multiple return statements often cause problems in python
+	# avoid them
+	# also we need or operation
 	if (max(accX) > maxThresh):
 		return accX.index(max(accX))
 	elif (min(accX) < minThresh):
@@ -31,7 +35,7 @@ def isImpact(accX, accY):
 	else:
 		return -1
 
-def compare(baseline1, baseline2, elec1, elec2, time_step, fig, sub1, sub2, sub3):
+def compare(baseline1, baseline2, elec1, elec2, time_step, fig1, sub11, sub12, sub13, fig2, sub21, sub22, sub23, fig3, sub31, sub32, sub33):
 
 	warnCount = 0  # how many times we have weird frequency lelel changes
 	
@@ -63,12 +67,13 @@ def compare(baseline1, baseline2, elec1, elec2, time_step, fig, sub1, sub2, sub3
 			warnCount += 1
 	
 	# send out warning if there are too many frequency level changes	
-	if (warnCount >= 2):
+	if (warnCount >= 0): # Testing purposes
 		# <inster warning msg code>
 		# <code for saving all PSD and coherence data
-		ft_plot(freq1, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1, fig, sub1, sub2, sub3)
-		# ft_plot(freq2, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2)
-		# xcoh_plot(freqC, C_base, C_impact, sumsBaseC, sumsImpactC)
+
+		ft_plot(freq1, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1, fig1, sub11, sub12, sub13)
+		ft_plot(freq2, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2, fig2, sub21, sub22, sub23)
+		xcoh_plot(freqC, C_base, C_impact, sumsBaseC, sumsImpactC, fig3, sub31, sub32, sub33)
 		
 	return
 
@@ -292,7 +297,7 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 		
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 
-def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
+def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC, fig, sub1, sub2, sub3):
 	'''
 	function plots Coherence of baseline and post-impact eeg data
 	also plots coherence in frequency groups in a bar graph
@@ -304,37 +309,31 @@ def xcoh_plot(freq, C_base, C_impact, sumsBaseC, sumsImpactC):
 	sumsBaseC - list of gamma, beta, alpha, theta, delta levels - baseline
 	sumsImpactC - list of gamma, beta, alpha, theta, delta levels - post-impact
 	'''
-
-	fig = plt.figure(figsize=(10,7))
 	
-	sub1 = fig.add_subplot(311)  # Coherence of baseline
+	# Coherence of baseline
 	sub1.set_title('Coherence plot - Baseline', fontsize = 16)
 	sub1.set_xlabel('f[Hz]')
 	sub1.set_ylabel('Coherence')
 	sub1.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub1.plot(freq, C_base)
-	
-	sub2 = fig.add_subplot(312)  # Coherence of post-impact data
-	sub2.set_title('Coherence plot - Post-Impact', fontsize = 16)
+
+	sub2.set_title('Coherence plot - Post-Impact', fontsize=16)
 	sub2.set_xlabel('f[Hz]')
 	sub2.set_ylabel('Coherence')
 	sub2.set_xticks([-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50])
 	sub2.plot(freq, C_impact)
-	
-	# levels of Coherence in different frequency groups
-	# display baseline and post-impact info in one bar graph
+
 	ind = np.arange(len(sumsBaseC))
 	width = 0.15
-	sub3 = fig.add_subplot(313) 
 	rects1 = sub3.bar(ind, sumsBaseC, width, color='b')
 	rects2 = sub3.bar(ind + width, sumsImpactC, width, color='r')
 	sub3.set_title("Levels of Coherence in Frequency Groups", fontsize = 16)
 	sub3.set_xticks(ind + width / 2)
 	sub3.set_xticklabels(("Delta", "Theta", "Alpha", "Beta", "Gamma"))
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
-	
+
 	plt.tight_layout()
 	plt.ion()
 	#plt.show()
-	
+
 	return
