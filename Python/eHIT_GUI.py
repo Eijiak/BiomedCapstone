@@ -161,8 +161,8 @@ def plotData(i):
             # Plot elec1 values
             a1.clear()
             timeValues = list(range(previousNumberValues, currentNumberValues))
-            for i in timeValues:
-                i = i*time_step
+            for i in range(0,timeValues):
+                timeValues[i] = timeValues[i]*time_step
             a1.plot(timeValues,elec1[previousNumberValues:currentNumberValues],
                     "r")
             a1.set_xlabel("Time")
