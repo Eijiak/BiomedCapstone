@@ -11,7 +11,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.figure import Figure
 from matplotlib import style
 import matplotlib.pyplot as plt
-#from PIL import Image,ImageTk
+from PIL import Image,ImageTk
 from numpy import fft
 from datetime import datetime
 import time
@@ -21,7 +21,7 @@ import comparison
 matplotlib.use("TkAgg")
 print("Loading..")
 
-HUGE_FONT=("RobotoCondensed",30)
+HUGE_FONT=("RobotoCondensed",50)
 LARGE_FONT=("Verdana",12)
 TITLE_FONT=("RobotoCondensed",12)
 NORM_FONT=("Verdana",10)
@@ -47,8 +47,10 @@ currentIndex = 0
 numDiff = 0
 impactIndex = 0
 isConky = False
-recordTime = 250
+isRecBaseline = False
+recordTime = 500
 impactDataRecorded = False
+sig1 = []
 
 # Figure for main page
 mainFig = Figure()
@@ -56,19 +58,19 @@ a1 = mainFig.add_subplot(121)
 a2 = mainFig.add_subplot(122)
 
 # Figure for report page
-reportFigPSD1 = plt.figure()
+reportFigPSD1 = plt.figure(figsize=(10,6))
 subPSD11 = reportFigPSD1.add_subplot(311)
 subPSD12 = reportFigPSD1.add_subplot(312)
 subPSD13 = reportFigPSD1.add_subplot(313)
 # plt.tight_layout()
 
-reportFigPSD2 = plt.figure()
+reportFigPSD2 = plt.figure(figsize=(10,6))
 subPSD21 = reportFigPSD2.add_subplot(311)
 subPSD22 = reportFigPSD2.add_subplot(312)
 subPSD23 = reportFigPSD2.add_subplot(313)
 # plt.tight_layout()
 
-reportFigC = plt.figure()
+reportFigC = plt.figure(figsize=(10,6))
 subC1 = reportFigC.add_subplot(311)
 subC2 = reportFigC.add_subplot(312)
 subC3 = reportFigC.add_subplot(313)
@@ -81,25 +83,28 @@ def getData():
     global accY
     print("getting data")
     dataLink = 'http://192.168.4.1/'
-    data = urllib.request.urlopen(dataLink)
-    data = data.readall().decode("utf-8")
+    try:
+        data = urllib.request.urlopen(dataLink)
+        data = data.readall().decode("utf-8")
 
-    endIndex0 = data.find(',')
-    endIndex1 = data.find(',', endIndex0 + 1)
-    endIndex2 = data.find(',', endIndex1 + 1)
-    endIndex3 = len(data) - 1
+        endIndex0 = data.find(',')
+        endIndex1 = data.find(',', endIndex0 + 1)
+        endIndex2 = data.find(',', endIndex1 + 1)
+        endIndex3 = len(data) - 1
 
-    if (endIndex0 > 0):  # Checks that there is a comma
-        if (endIndex0 % 3 == 0 and (endIndex1-endIndex0-1) % 3 == 0 and (endIndex2-endIndex1-1) % 3 == 0 and (endIndex3-endIndex2) % 3 == 0):
-            # Break data into chunks of n chars
-            elec1 = elec1 + [float(data[i:i + n]) for i in range(0, endIndex0 - 1, n)]  # Differential input 1
-            elec2 = elec2 + [float(data[j:j + n]) for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
-            accX = accX + [float(data[k:k + n]) for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
-            accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
-            elec1 = comparison.butter_bandpass_filter(elec1, 1, 40, 0.00675)
-            elec2 = comparison.butter_bandpass_filter(elec2, 1, 40, 0.00675)
-            return True
-    return False
+        if (endIndex0 > 0):  # Checks that there is a comma
+            if (endIndex0 % 3 == 0 and (endIndex1-endIndex0-1) % 3 == 0 and (endIndex2-endIndex1-1) % 3 == 0 and (endIndex3-endIndex2) % 3 == 0):
+                # Break data into chunks of n chars
+                elec1 = elec1 + [float(data[i:i + n]) for i in range(0, endIndex0 - 1, n)]  # Differential input 1
+                elec2 = elec2 + [float(data[j:j + n]) for j in range(endIndex0 + 1, endIndex1 - 1, n)]  # Differential input 2
+                accX = accX + [float(data[k:k + n]) for k in range(endIndex1 + 1, endIndex2 - 1, n)]  # X-axis of accelerometer
+                accY = accY + [float(data[m:m + n]) for m in range(endIndex2 + 1, endIndex3, n)]  # Y-axis of accelerometer
+                # elec1 = comparison.butter_bandpass_filter(elec1, 1, 50, 0.00675)
+                # elec2 = comparison.butter_bandpass_filter(elec2, 1, 50, 0.00675)
+                return True
+        return False
+    except urllib.error.HTTPError:
+        return False
 
 def plotData(i):
 
@@ -129,12 +134,15 @@ def plotData(i):
     global reportFigPSD1
     global reportFigPSD2
     global reportFigC
+    global isRecBaseline
+    global sig1
 
     if (getData()):
-
+        print(str(max(accX)) + " " + str(max(accY)))
         # Impact Checking
-        if (isConky != True and impactDataRecorded != True):
+        if (isConky != True and impactDataRecorded != True and isRecBaseline):
             impactIndex = comparison.isImpact(accX, accY)
+            print("impact check!")
             if (impactIndex >= 0):
                 impactText = mainFig.text(0.5, 0.5, "Impact Detected!", fontsize=40, ha='center',
                                           bbox={'facecolor': 'red', 'alpha': 0.8, 'pad': 10})
@@ -144,7 +152,7 @@ def plotData(i):
             if(currentIndex - impactIndex > recordTime):
                 elec1Impact = elec1[impactIndex:(impactIndex + recordTime)]
                 elec2Impact = elec2[impactIndex:(impactIndex + recordTime)]
-                comparison.compare(elec1Baseline, elec2Baseline, elec1Impact, elec2Impact, 0.00675, reportFigPSD1, subPSD11, subPSD12, subPSD13, reportFigPSD2, subPSD21, subPSD22, subPSD23, reportFigC, subC1, subC2, subC3)
+                comparison.compare(elec1Baseline, elec2Baseline, elec1Impact, list(sig1[impactIndex:(impactIndex+recordTime)]), 0.00675, reportFigPSD1, subPSD11, subPSD12, subPSD13, reportFigPSD2, subPSD21, subPSD22, subPSD23, reportFigC, subC1, subC2, subC3)
                 print('Recorded impact!')
                 print(elec1Impact)
                 print(elec2Impact)
@@ -152,17 +160,19 @@ def plotData(i):
                 impactDataRecorded = True
 
         # Data plotting
-        if (i % 3 == 0):  # Only graph data every 3 iterations
+        if (i % 2 == 0):  # Only graph data every 3 iterations
             currentNumberValues = len(elec1)
             numDiff = currentNumberValues - previousNumberValues
             currentIndex = currentNumberValues - 1
 
+            # Get real time values
+            timeValues = list(range(previousNumberValues, currentNumberValues))
+            for i in range(0, len(timeValues)):
+                timeValues[i] = timeValues[i] * time_step
+            timeValues = list(timeValues)
+
             # Plot elec1 values
             a1.clear()
-            timeValues = list(range(previousNumberValues, currentNumberValues))
-            for i in range(0,len(timeValues)):
-                timeValues[i] = timeValues[i]*time_step
-            timeValues = list(timeValues)
             a1.plot(timeValues,elec1[previousNumberValues:currentNumberValues],
                     "r")
             a1.set_xlabel("Time")
@@ -170,9 +180,32 @@ def plotData(i):
             title="EEG Input 1"
             a1.set_title(title)
 
+            fs = 166.67
+            N = currentNumberValues
+            time = np.arange(N) / fs
+            freq1 = 40
+            freq2 = 45
+            freq3 = 23
+            freq4 = 20
+            freq5 = 10
+            freq6 = 12
+            freq7 = 5
+            freq8 = 7
+            freq9 = 2
+            freq10 = 3
+            noise_power = 0.5 * fs / 2
+            sig1 = (2 * np.sqrt(2)) * np.sin(2 * np.pi * freq1 * time)  # gamma
+            sig1 += (2 * np.sqrt(3)) * np.sin(2 * np.pi * freq3 * time)  # beta
+            sig1 += (2 * np.sqrt(3)) * np.sin(2 * np.pi * freq4 * time)  # beta
+            sig1 += (2 * np.sqrt(1.5)) * np.sin(2 * np.pi * freq6 * time)  # alpha
+            sig1 += (2 * np.sqrt(2)) * np.sin(2 * np.pi * freq5 * time)  # alpha
+            sig1 += (2 * np.sqrt(3)) * np.sin(2 * np.pi * freq7 * time)  # theta
+            sig1 += (2 * np.sqrt(5)) * np.sin(2 * np.pi * freq10 * time)  # delta
+            sig1 += np.random.normal(scale=np.sqrt(noise_power), size=time.shape)
+
             # Plot elec2 values
             a2.clear()
-            a2.plot(elec2[previousNumberValues:currentNumberValues],
+            a2.plot(timeValues, list(sig1[previousNumberValues:currentNumberValues]),
                     "b")
             a2.set_xlabel("Time")
             a2.set_ylabel("Magnitude")
@@ -186,6 +219,7 @@ def recordBaseline():
     global elec1Baseline
     global elec2Baseline
     global recordTime
+    global isRecBaseline
     print('got here')
     baselineIndex = currentIndex
     i = 0
@@ -198,10 +232,12 @@ def recordBaseline():
             i=i+1
         if (currentIndex - baselineIndex >= recordTime):
             elec1Baseline = elec1[baselineIndex:(baselineIndex+recordTime)]
-            elec2Baseline = elec2[baselineIndex:(baselineIndex + recordTime)]
+            # elec2Baseline = elec2[baselineIndex:(baselineIndex + recordTime)]
+            elec2Baseline = sig1[baselineIndex:(baselineIndex+recordTime)]
             print('Recorded baseline!')
             print(elec1Baseline)
             print(elec2Baseline)
+            isRecBaseline = True
             break
     # recBasPopup = tk.Tk()
     # recBasPopup.wm_title("Baseline done!")
@@ -223,13 +259,21 @@ def rec_and_pop():
     recordBaseline()
     recBasePopupMsg("Baseline recording completed!")
 
+
 def recBasePopupMsg(msg):
     recpopup=tk.Tk()
     recpopup.wm_title("Baseline completed!")
     label=ttk.Label(recpopup,text=msg,font=NORM_FONT)
-    label.pack(side="top",fill="x",pady=10)
-    recpopup.after(2000, lambda: recpopup.destroy())
+    label.pack(side="top",fill="x",pady=100)
+    recpopup.after(3000, lambda: recpopup.destroy())
     recpopup.mainloop()
+
+def showImg(self):
+    load=Image.open('logo.png')
+    render=ImageTk.PhotoImage(load)
+    img=Label(self,image=render)
+    img.image=render
+    img.place(x=0,y=0)
 
 class eHIT(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -249,7 +293,7 @@ class eHIT(tk.Tk):
         filemenu.add_command(label="Main Page",
                              command=lambda:self.show_frame(mainPage))
         filemenu.add_separator()
-        filemenu.add_command(label="Exit",command=quit)
+        filemenu.add_command(label="Exit",command=showImg)
         menubar.add_cascade(label="File",menu=filemenu)
 
         tk.Tk.config(self,menu=menubar)
@@ -269,11 +313,22 @@ class eHIT(tk.Tk):
 class homePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
-        label1=ttk.Label(self,text="eHIT", font=LARGE_FONT)
+        label1=ttk.Label(self,text="eHIT", font=HUGE_FONT)
         label1.pack(pady=10,padx=10)
         label2 = ttk.Label(self, text="EEG Head Injury Tool", font=LARGE_FONT)
         label2.pack(pady=10, padx=10)
-
+        # canvas = tk.Canvas(self, width=500, height=500)
+        # canvas.pack()
+        img = Image.open("logo1.ico")
+        photo = ImageTk.PhotoImage(img)
+        # canvas.create_image(250,250,image=tk_img)
+        # image = Image.open('logo.jpg')
+        # photo = ImageTk.PhotoImage(image)
+        #
+        img2 = tk.Label(image=photo)
+        # img2.image = photo2
+        # panel = tk.Label(self, image=img)
+        img2.pack()
         button1=ttk.Button(self,text="Let's get started!",
                           command=lambda: controller.show_frame(mainPage))
         button1.pack()

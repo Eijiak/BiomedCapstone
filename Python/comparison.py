@@ -31,7 +31,7 @@ def isImpact(accX, accY):
 
 	# experimentally determined resting values of 549 (accX) and 548 (accY)
 	minThresh = 546
-	maxThresh = 551
+	maxThresh = 552
 	
 	# isImpactMax = ( max(accX) > maxThresh ) or ( max(accY) > maxThresh ) or ( min(accX) < minThresh ) or ( min(accY) < minThresh )
 	#
@@ -69,7 +69,7 @@ def compare(baseline1, baseline2, elec1, elec2, time_step, fig1, sub11, sub12, s
 	# coherence for baseline and post-impact
 	# see xcoh_compare() for more details
 	freqC, C_base, C_impact, sumsBaseC, sumsImpactC, relDiffC = xcoh_compare(baseline1, baseline2, elec1, elec2, time_step)
-	
+	print(C_impact)
 	# go through the relative differences in frequency level and 
 	# increment warnCount if relDiff >= 0.8 for psd and relDiff >= 0.5 for coherence
 	for i in range(0,5):
@@ -154,7 +154,7 @@ def ft_compare(baseline, elec, time_step):
 		elif ((freqBase[i] >= 1) and (freqBase[i] <= 4)): #delta
 			deltaSumBase += PSD_base[i]
 			
-	sumsBase = [deltaSumBase, thetaSumBase, alphaSumBase, betaSumBase, gammaSumBase]
+	sumsBase = list([deltaSumBase, thetaSumBase, alphaSumBase, betaSumBase, gammaSumBase])
 	
 	for j in range(0,len(freqImpact)):
 		if ((freqImpact[j] > 30) and (freqImpact[j] <= 50)): #gamma
@@ -168,7 +168,7 @@ def ft_compare(baseline, elec, time_step):
 		elif ((freqImpact[j] >= 1) and (freqImpact[j] <= 4)): #delta
 			deltaSumImpact += PSD_impact[j]
 			
-	sumsImpact = [deltaSumImpact, thetaSumImpact, alphaSumImpact, betaSumImpact, gammaSumImpact]
+	sumsImpact = list([deltaSumImpact, thetaSumImpact, alphaSumImpact, betaSumImpact, gammaSumImpact])
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
@@ -178,8 +178,8 @@ def ft_compare(baseline, elec, time_step):
 			relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
 		else:
 			relDiff.append(0)
-		
-	return freqBase, PSD_base, PSD_impact, sumsBase, sumsImpact, relDiff
+
+	return freqBase, PSD_base, PSD_impact, list(sumsBase), list(sumsImpact), list(relDiff)
 		
 	
 def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD, fig, sub1, sub2, sub3):
@@ -223,7 +223,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD, fig, sub1, s
 	sub3.set_xticklabels(("Delta", "Theta", "Alpha", "Beta", "Gamma"))
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
 	
-	plt.tight_layout(pad=0.5,w_pad=0.5,h_pad=15)
+	plt.tight_layout(pad=0.5,w_pad=0.5,h_pad=1)
 	plt.ion()
 	#plt.show()
 	
@@ -310,9 +310,12 @@ def xcoh_compare(baseline1, baseline2, elec1, elec2, time_step):
 	
 	# difference in the gamma, beta, alpha, theta, and delta levels 
 	# of baseline and post-impact
-	relDiff = list(range(0,5))
+	relDiff = []
 	for k in range(0,5):
-		relDiff[k] = ((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
+		if (sumsBase[k]>0):
+			relDiff.append((abs(sumsBase[k] - sumsImpact[k]))/sumsBase[k])
+		else:
+			relDiff.append(0)
 		
 	return freqBase, C_base, C_impact, sumsBase, sumsImpact, relDiff
 
