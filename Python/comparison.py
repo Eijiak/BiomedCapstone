@@ -70,10 +70,10 @@ def compare(baseline1, baseline2, elec1, elec2, time_step, fig1, sub11, sub12, s
 	if (warnCount >= 0): # Testing purposes
 		# <inster warning msg code>
 		# <code for saving all PSD and coherence data
-
+		xcoh_plot(freqC, C_base, C_impact, sumsBaseC, sumsImpactC, fig3, sub31, sub32, sub33)
 		ft_plot(freq1, PSD_base1, PSD_impact1, sumsBasePSD1, sumsImpactPSD1, fig1, sub11, sub12, sub13)
 		ft_plot(freq2, PSD_base2, PSD_impact2, sumsBasePSD2, sumsImpactPSD2, fig2, sub21, sub22, sub23)
-		xcoh_plot(freqC, C_base, C_impact, sumsBaseC, sumsImpactC, fig3, sub31, sub32, sub33)
+
 		
 	return
 
@@ -204,7 +204,7 @@ def ft_plot(freq, PSD_base, PSD_impact, sumsBasePSD, sumsImpactPSD, fig, sub1, s
 	sub3.set_xticklabels(("Delta", "Theta", "Alpha", "Beta", "Gamma"))
 	sub3.legend((rects1[0], rects2[0]), ('Baseline', 'Post-Impact'))
 	
-	plt.tight_layout()
+	plt.tight_layout(pad=0.5,w_pad=0.5,h_pad=15)
 	plt.ion()
 	#plt.show()
 	
