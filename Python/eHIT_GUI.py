@@ -140,7 +140,7 @@ def plotData(i):
     if (getData()):
         print(str(max(accX)) + " " + str(max(accY)))
         # Impact Checking
-        if (isConky != True and impactDataRecorded != True and isRecBaseline):
+        if ((isConky != True) and (impactDataRecorded != True) and isRecBaseline):
             impactIndex = comparison.isImpact(accX, accY)
             print("impact check!")
             if (impactIndex >= 0):
@@ -202,7 +202,7 @@ def plotData(i):
             sig1 += (2 * np.sqrt(3)) * np.sin(2 * np.pi * freq7 * time)  # theta
             sig1 += (2 * np.sqrt(5)) * np.sin(2 * np.pi * freq10 * time)  # delta
             sig1 += np.random.normal(scale=np.sqrt(noise_power), size=time.shape)
-
+            sig1 += 106
             # Plot elec2 values
             a2.clear()
             a2.plot(timeValues, list(sig1[previousNumberValues:currentNumberValues]),
@@ -239,12 +239,6 @@ def recordBaseline():
             print(elec2Baseline)
             isRecBaseline = True
             break
-    # recBasPopup = tk.Tk()
-    # recBasPopup.wm_title("Baseline done!")
-    # label = ttk.Label(recBasPopup, text="Baseline Done!", font=NORM_FONT)
-    # label.pack(side="top", fill="x", pady=10)
-    # recBasPopup.mainloop()
-    # recpopup.destroy()
 
 def popupmsg(msg):
     popup=tk.Tk()
@@ -317,17 +311,9 @@ class homePage(tk.Frame):
         label1.pack(pady=10,padx=10)
         label2 = ttk.Label(self, text="EEG Head Injury Tool", font=LARGE_FONT)
         label2.pack(pady=10, padx=10)
-        # canvas = tk.Canvas(self, width=500, height=500)
-        # canvas.pack()
         img = Image.open("logo1.ico")
         photo = ImageTk.PhotoImage(img)
-        # canvas.create_image(250,250,image=tk_img)
-        # image = Image.open('logo.jpg')
-        # photo = ImageTk.PhotoImage(image)
-        #
         img2 = tk.Label(image=photo)
-        # img2.image = photo2
-        # panel = tk.Label(self, image=img)
         img2.pack()
         button1=ttk.Button(self,text="Let's get started!",
                           command=lambda: controller.show_frame(mainPage))
@@ -377,10 +363,6 @@ class reportPage1(tk.Frame):
         canvasReport.show()
         canvasReport.get_tk_widget().grid(row=1, rowspan=3)
         print("initializing report page")
-
-        # Matplotlib toolbar
-        # toolbar = NavigationToolbar2TkAgg(canvasReport, self)
-        # toolbar.update()
         canvasReport._tkcanvas.grid(row=1, rowspan=3)
 
         ttk.Style().configure("RB.TButton", relief='flat', background='red')

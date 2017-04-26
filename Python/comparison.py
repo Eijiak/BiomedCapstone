@@ -1,5 +1,3 @@
-# Note Ctrl+C is Keyboard interrupt
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
@@ -30,8 +28,8 @@ def isImpact(accX, accY):
 	# inputs - list of accelerometer values in X and Y direction
 
 	# experimentally determined resting values of 549 (accX) and 548 (accY)
-	minThresh = 546
-	maxThresh = 552
+	minThresh = 542
+	maxThresh = 556
 	
 	# isImpactMax = ( max(accX) > maxThresh ) or ( max(accY) > maxThresh ) or ( min(accX) < minThresh ) or ( min(accY) < minThresh )
 	#
@@ -40,16 +38,17 @@ def isImpact(accX, accY):
 	# branching multiple return statements often cause problems in python
 	# avoid them
 	# also we need or operation
+	returnIndex = -1
 	if (max(accX) > maxThresh):
-		return accX.index(max(accX))
+		returnIndex = accX.index(max(accX))
 	elif (min(accX) < minThresh):
-		return accX.index(min(accX))
+		returnIndex = accX.index(min(accX))
 	elif (max(accY) > maxThresh):
-		return accY.index(max(accY))
+		returnIndex = accY.index(max(accY))
 	elif (min(accY) < minThresh):
-		return accY.index(min(accY))
-	else:
-		return -1
+		returnIndex = accY.index(min(accY))
+
+	return returnIndex
 
 def compare(baseline1, baseline2, elec1, elec2, time_step, fig1, sub11, sub12, sub13, fig2, sub21, sub22, sub23, fig3, sub31, sub32, sub33):
 
